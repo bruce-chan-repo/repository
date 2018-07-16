@@ -1,0 +1,41 @@
+#foreach($role in $!{pageInfo.list})
+<tr>
+	<td><input type="checkbox" lay-skin="primary" value="$!{role.id}"></td>
+	<td>$!{role.id}</td>
+	<td>$!{role.roleName}</td>
+	<td>$!{role.description}</td>
+	<td>#if($!{role.available}) 可用 #else 不可用 #end</td>
+	<td>$!{role.createTime}</td>
+	<td>
+		<button class="layui-btn layui-btn-sm role-edit" data-id="$!{role.id}">编辑</button>
+		<button class="layui-btn layui-btn-primary layui-btn-sm role-accredit" data-id="$!{role.id}">授权</button>
+	</td>
+</tr>
+#end
+
+<script type="text/javascript">
+	// 保证分页插件只加载一次.
+	if (i == 1) {
+		layui.use('laypage', function(){
+		   var laypage = layui.laypage;
+		  
+		   //完整功能
+		   laypage.render({
+			 elem: 'pageHelper',
+			 count: '$!{pageInfo.total}',
+			 limit: '$!{pageInfo.pageSize}',
+			 layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip'],
+		     jump: function(obj, first){
+		    	 if (!first) {
+		    		 $("#currPage").val(obj.curr);
+			    	 toLoad(obj.curr);
+		    	 }
+		    	 
+		    	 return false;
+		     }
+		   });
+		});
+	}
+	
+	form.render('checkbox');
+</script>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>客户列表</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.btn-group{
+			margin-right: 5px;
+		}
+	</style>
+</head>
+<body>
+	<div class="btn-group">
+	  <button class="layui-btn layui-btn-sm client-add" data-type="getCheckData">添加客户</button>
+	  <button class="layui-btn layui-btn-sm layui-btn-primary client-delete" data-type="isAll">删除</button>
+	</div>
+	
+	<div class="layui-form">
+		<table class="layui-table">
+			<colgroup>
+				<col width="150">
+				<col width="200">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th><input type="checkbox" lay-skin="primary" id="checkAll"></th>
+					<th>编号</th>
+					<th>客户名称</th>
+					<th>客户电话</th>
+					<th>备注</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+	</div>
+	<div id="pageHelper"></div>
+	<input type="hidden" id="currPage" value="1"/>
+	
+	<!-- JavaScript -->
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/js/common.js"></script>
+	
+	<script type="text/javascript">
+		$(function() {
+			// 添加客户信息
+			$(".client-add").bind("click", function() {
+				layer.open({
+					  type: 2,
+					  title: '添加客户',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['520px', '350px'],
+					  content: '#getContext()/client/toAddClient.do',
+					  cancel: function(index, lerayo) {
+						  window.location.reload();
+					  }
+				});
+			});	
+			
+			// 修改客户信息
+			$(document).on("click", ".client-edit", function() {
+				var clientId = $(this).data("id");
+				
+				layer.open({
+					  type: 2,
+					  title: '编辑客户',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['520px', '350px'],
+					  content: '#getContext()/client/toEditClient.do?id=' + clientId,
+					  cancel: function(index, lerayo) {
+						  window.location.reload();
+					  }
+				});
+			});
+			
+			// 删除客户信息
+			$(".client-delete").bind("click", function() {
+				var ids = "";
+				$("tbody").find(":checked").each(function( index ) {
+					ids += "," + $(this).val();
+				});
+				
+				if (ids == "") {
+					layer.alert("请选择需要删除的客户");					
+					return false;
+				}
+				
+				layer.confirm("确定删除客户吗？", {
+				  btn: ["确定", "取消"]
+				}, function(){
+					// 进行删除操作.
+					ids = ids.substring(1);
+					
+					jQuery.ajax({
+						url: "#getContext()/client/deleteClients.do",
+						type: "post",
+						data: {"clientIds": ids},
+						dataType: "json",
+						async: false,
+						success: function( result ) {
+							layer.confirm(result.msg, {
+							  btn: ["确定"]
+							}, function(){
+							  layer.close(layer.index);
+							  window.location.reload();
+							});
+						},
+						error: function( result ) {
+							layer.confirm(result.msg, {
+							  btn: ["确定"]
+							}, function(){
+							  layer.close(layer.index);
+							  window.location.reload();
+							});
+						}
+					});
+				}, function() {
+					layer.close(layer.index);
+				});
+			});
+			
+			// 全选.
+			$(document).on("click", "#checkAll + div", function() {
+				var isChecked = $("#checkAll").is(":checked");
+				
+				$("tbody").find(":checkbox").prop("checked", isChecked);
+				
+				form.render('checkbox');
+			});
+			
+			toLoad();
+		});
+		
+		layui.use("form", function() {
+			form = layui.form;
+		});
+		
+		var i = 0;
+		// 加载分页信息.
+		function toLoad() {
+			var currPage = $("#currPage").val();
+			
+			var data = $("form").serializeObject();
+			data['curpage'] = currPage;
+			
+			$("tbody").empty();
+			
+			$("tbody").load("#getContext()/client/clients.do", data);
+			
+			i++;
+		}
+	</script>
+</body>
+</html>

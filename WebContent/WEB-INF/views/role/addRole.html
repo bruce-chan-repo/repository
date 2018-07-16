@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>添加角色</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<link rel="stylesheet" href="#getContext()/static/css/common.css">
+	<style type="text/css">
+		.layui-form{
+			margin: 10px;
+		}
+		.layui-form .layui-form-label{
+			width: 100px;
+		}
+		.layui-form .layui-input-inline{
+			width: 300px;			
+		}
+		.layui-form-item>span{
+			position: relative;
+			top: 8px;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" type="post" lay-filter="form">
+		<input type="hidden" name="id" id="role-id" value="$!{role.id}" />
+	
+		<div class="layui-form-item">
+			<label class="layui-form-label">角色名称</label>
+			<div class="layui-input-inline">
+				<input type="text" name="roleName"
+					placeholder="请输入角色名称" autocomplete="off" class="layui-input" lay-verify="roleName" value="$!{role.roleName}"/>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">角色描述</label>
+			<div class="layui-input-inline">
+				<input type="text" name="description" placeholder="请输入角色描述" autocomplete="off" value="$!{role.description}"
+					class="layui-input" >
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">是否可用</label>
+			<div class="layui-input-block">
+		      <input type="checkbox" lay-filter="switch" lay-skin="switch" #if("$!{role.available}" == "true") checked #end />
+		      <input type="hidden" name="available" value="#if($!{role}) $!{role.available} #else false #end"/>
+		    </div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit>立即提交</button>
+				<button type="reset" class="layui-btn layui-btn-primary reset">重置</button>
+			</div>
+		</div>
+	</form>
+	
+	<!-- JavaScript -->
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="#getContext()/static/js/jquery.form.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		var userId = $("#role-id").val();
+	
+		layui.use('form', function(){
+			 form = layui.form;
+			 
+			 form.on('submit(form)', function( data ){
+				 var url = "#getContext()/role/addRole.do";
+				 // 如果是编辑提交，则跳转到其他地址
+				 if (userId != "") {
+					 url = "#getContext()/role/editRole.do";
+				 }
+				 
+				 $("form").ajaxSubmit({
+					url: url,
+					type: "post",
+					dataType: "json",
+					success: function( result ) {
+						layer.msg( result.msg );
+						$(".reset").trigger("click");
+					},
+					error: function( result ) {
+						layer.msg( result.msg );
+						$(".reset").trigger("click");
+					}
+				 });
+				  
+				 return false;
+			 });  
+			 
+			 // 开关按钮监听事件.
+			 form.on('switch(switch)', function(data){
+			     $("input[name='available']").val(this.checked);
+			 });  
+		});
+	</script>
+	<script type="text/javascript" src="#getContext()/static/js/layui.validate.ext.js"></script>
+	<script type="text/javascript">
+		 form.verify({
+			 roleName: function(value, item) {
+				 if (value == "") {
+					return "角色名称不能为空";
+				 }
+				
+				 if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+					return '角色名称不能有特殊字符';
+			     }
+				 
+				 var available = false;
+				 jQuery.ajax({
+					url: "#getContext()/role/checkRoleNameIsLawful.do",
+					type: "post",
+					data: {"roleName": value, "roleId": "$!{role.id}"},
+					dataType: "json",
+					async: false,
+					success: function( result ) {
+						if (result.code == "1") {
+							available = true;
+						}
+					}
+				 });
+				
+				 if ( !available ) {
+					return "当前用户名已经存在";
+				 }
+			 }
+		 });
+	</script>
+</body>
+</html>

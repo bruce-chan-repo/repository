@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>订单列表</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.btn-group{
+			margin-right: 5px;
+		}
+		.layui-split input{
+			width: 300px;
+		}
+		.seach-detail{
+			color: #009688;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" >
+		<div class="btn-group">
+		  <div class="layui-inline layui-split">
+			    <input type="text" name="customName" placeholder="订单编号、联系人或联系电话" autocomplete="off" class="layui-input" lay-verify=""/>
+		  </div>
+		  <div class="layui-inline">
+		      <div class="layui-input-inline">
+		        <input type="text" name="createTime" id="date" lay-verify="date" placeholder="订单日期" autocomplete="off" class="layui-input">
+		      </div>
+		  </div>
+		  #if ($!{currUser.role.id} == 1) 
+		 	<div class="layui-input-inline">
+				<select name="userId" lay-verify="select" value="-1">
+					<option value="-1">请选择客户...</option>
+					#foreach($client in $!{clients})
+						<option value="$!{client.id}">$!{client.realName}</option>
+					#end
+				</select>
+			</div>	  
+		  #end
+				  
+		  <button class="layui-btn seach" data-type="reload">搜索</button>
+		</div>
+	</form>
+	<div class="layui-form">
+		<table class="layui-table">
+			<colgroup>
+				<col width="150">
+				<col width="200">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>编号</th>
+					<th>合同号</th>
+					<th>订单所属客户</th>
+					<th>联系人</th>
+					<th>联系电话</th>
+					<th>发货公司</th>
+					<th>发货地址</th>
+					<th>备注</th>
+					<th>日期</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+	</div>
+	<div id="pageHelper"></div>
+	<input type="hidden" id="currPage" value="1"/>
+	
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/js/common.js"></script>
+	
+	<script type="text/javascript">
+		$(function() {
+			// 全选.
+			$(document).on("click", "#checkAll + div", function() {
+				var isChecked = $("#checkAll").is(":checked");
+				
+				$("tbody").find(":checkbox").prop("checked", isChecked);
+				
+				form.render('checkbox');
+			});
+			
+			toLoad();
+			
+			// 查看订单详情.
+			$(document).on("click", ".seach-detail", function() {
+				var id = $(this).data("id");
+				
+				layer.open({
+					  type: 2,
+					  title: '订单详情',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['1300px', '700px'],
+					  content: '#getContext()/order/detail.do?id=' + id
+				});
+			});
+			
+			// 筛选按钮点击事件
+			$(".seach").bind("click", function(){
+				i = 0;						// 修改此参数可重新刷新分页
+				$("#currPage").val("1");	// 修改分页值为第一页 
+				toLoad();
+				return false;
+			});
+		});
+		
+		layui.use("form", function() {
+			form = layui.form;
+		});
+		
+		layui.use('laydate', function(){
+			var laydate = layui.laydate;
+			  
+			//执行一个laydate实例
+			laydate.render({
+			  elem: '#date'
+			});
+		});
+		
+		var i = 0;
+		// 加载分页信息.
+		function toLoad() {
+			var currPage = $("#currPage").val();
+			
+			var data = $("form").serializeObject();
+			data['curpage'] = currPage;
+			
+			$("tbody").empty();
+			
+			$("tbody").load("#getContext()/order/orders.do", data);
+			
+			i++;
+		}
+	</script>
+</body>
+</html>

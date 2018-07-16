@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ytem.repository.dao.StockMapper">
+  <resultMap id="BaseResultMap" type="com.ytem.repository.bean.Stock">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="product_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="sequence" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="status" javaType="java.lang.Byte" jdbcType="TINYINT" />
+      <arg column="remark" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="is_sold" javaType="java.lang.Boolean" jdbcType="BIT" />
+      <arg column="batch_number" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="contract_number" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="bill_number" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="quantity" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="import_date" javaType="java.lang.String" />
+      <arg column="arrival_date" javaType="java.lang.String" />
+      <arg column="create_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+      <arg column="modified_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+    </constructor>
+    
+    <association property="product" javaType="Product" column="product_id" select="com.ytem.repository.dao.ProductMapper.selectByPrimaryKey"></association>
+    <association property="user" javaType="User" column="user_id" select="com.ytem.repository.dao.UserMapper.selectByPrimaryKey"></association>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, product_id, user_id, sequence, status, remark, is_sold, batch_number, contract_number, bill_number, quantity, import_date, arrival_date, create_time, modified_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ytem_stock
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ytem_stock
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ytem.repository.bean.Stock">
+    insert into ytem_stock (id, product_id, user_id, sequence, 
+      status, remark, create_time, 
+      modified_time)
+    values (#{id,jdbcType=INTEGER}, #{productId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{sequence,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifiedTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ytem.repository.bean.Stock">
+    insert into ytem_stock
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="productId != null">
+        product_id,
+      </if>
+      <if test="userId != null">
+      	user_id,
+      </if>
+      <if test="sequence != null">
+        sequence,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="quantity != null">
+      	quantity,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="batchNumber">
+      	batch_number,
+      </if>
+      <if test="contractNumber">
+		contract_number,      
+      </if>
+      <if test="billNumber">
+      	bill_number,
+      </if>
+      create_time,
+      modified_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="productId != null">
+        #{productId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+      	#{userId,jdbcType=INTEGER},
+      </if>
+      <if test="sequence != null">
+        #{sequence,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="quantity != null">
+      	#{quantity, jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNumber != null">
+        #{batchNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="contractNumber != null">
+        #{contractNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="billNumber != null">
+        #{billNumber,jdbcType=VARCHAR},
+      </if>
+      NOW(),
+      NOW()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ytem.repository.bean.Stock">
+    update ytem_stock
+    <set>
+      <if test="productId != null">
+        product_id = #{productId,jdbcType=INTEGER},
+      </if>
+      <if test="sequence != null">
+        sequence = #{sequence,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifiedTime != null">
+        modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ytem.repository.bean.Stock">
+    update ytem_stock
+    set product_id = #{productId,jdbcType=INTEGER},
+      sequence = #{sequence,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectStocks" parameterType="Stock" resultMap="BaseResultMap">
+  	<bind name="productName" value="'%' + product.productName + '%'"/>
+  	SELECT
+  		y.*
+  	FROM
+  		ytem_stock y
+  	INNER JOIN
+  		ytem_product p
+  	ON y.product_id = p.id
+  	<where>
+  		<if test="product.productName != null">
+  		   (p.product_name LIKE #{productName}
+  			OR
+  			p.product_code LIKE #{productName}
+  			OR
+  			CONCAT(y.sequence, "/", y.batch_number) LIKE #{productName}
+  			)
+  		</if>
+  		<if test="status != null and status != -1">
+  			AND status = #{status}
+  		</if>
+  		<if test="userId != null and userId != -1">
+  			AND user_id = #{userId}
+  		</if>
+  		AND is_sold = 0
+  	</where>
+  </select>
+  
+  <select id="selectByCondition" parameterType="Stock" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List" />
+  	FROM
+  		ytem_stock
+  	<where>
+  		<if test="id != null">
+  			id = #{id}
+  		</if>
+  		<if test="productId != null">
+  			AND product_id = #{productId}
+  		</if>
+  		<if test="sequence != null and sequence != ''">
+  			AND sequence = #{sequence}
+  		</if>
+  	</where>
+  	limit 1
+  </select>
+  
+  <select id="getStocks" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List"></include>
+  	FROM
+  		ytem_stock
+  </select>
+  
+  <insert id="batchInsert" parameterType="list">
+  	INSERT
+  		INTO
+  	ytem_stock
+  	(
+  		product_id,
+  		user_id,
+  		sequence,
+		remark,
+		batch_number,
+		contract_number,
+		bill_number,
+		import_date,
+		arrival_date,
+		create_time,
+		modified_time
+  	)
+  	VALUES
+	<foreach collection="list" item="stock" separator="," >
+  		(
+  			#{stock.productId},
+  			#{stock.userId},
+  			#{stock.sequence},
+  			#{stock.remark},
+  			#{stock.batchNumber},
+  			#{stock.contractNumber},
+  			#{stock.billNumber},
+  			<choose>
+  				<when test="stock.importDate != null and stock.importDate != ''">
+  					#{stock.importDate},
+  				</when>
+  				<otherwise>
+  					#{stock.arrivalDate},
+  				</otherwise>
+  			</choose>
+  			#{stock.arrivalDate},
+  			NOW(),
+  			NOW()
+  		)
+  	</foreach>
+  </insert>
+  
+  <select id="selectNeedPurchase" resultType="Stock">
+  	SELECT
+		b.product_name AS productName,
+		b.product_code AS productCode,
+		COUNT(1) AS rest
+	FROM
+		`ytem_stock` a
+	INNER JOIN
+		ytem_product b
+	ON
+		a.product_id = b.id
+	WHERE
+		is_sold = 0
+	GROUP BY
+		product_id
+	HAVING
+		COUNT(1) <![CDATA[ < ]]> 15;
+  </select>
+  
+  <update id="batchUpdateStatus" parameterType="Order">
+  	UPDATE
+		`ytem_stock` a
+	INNER JOIN
+		`ytem_product` b
+	ON a.product_id = b.id
+	SET
+		a.is_sold = 1
+	WHERE	
+		CONCAT(b.product_code, a.sequence, '/', a.batch_number)
+	IN
+	<foreach collection="orderItems" item="orderItem" open="(" close=")" separator=",">
+		CONCAT(#{orderItem.productCode}, #{orderItem.productSequence})
+	</foreach>
+  </update>
+  
+  <select id="getQuantityByCondition" parameterType="Stock" resultType="int">
+  	SELECT
+		quantity
+	FROM
+		`ytem_stock` a
+		INNER JOIN ytem_product b ON a.product_id = b.id 
+	WHERE
+		b.product_name = #{productName}
+		AND a.user_id = #{userId}
+  </select>
+  
+  <update id="updateQuantiyByCondition" parameterType="Stock">
+  	UPDATE ytem_stock a
+	INNER JOIN ytem_product b
+	on a.product_id = b.id
+	SET
+		a.quantity = #{quantity}
+	WHERE
+		a.user_id = #{userId}
+	AND 
+		b.product_name = #{productName}
+  </update>
+  
+  <delete id="batchDelete" parameterType="map">
+  	DELETE
+  		FROM	
+  	ytem_stock
+  	WHERE
+  		id
+  	IN
+  	(${stockIds})
+  </delete>
+  
+  <select id="getStockCountByProductName" parameterType="map" resultType="Stock">
+  	SELECT
+		quantity
+	FROM
+		ytem_stock 
+	WHERE
+		product_id IN 
+		( 
+			SELECT id FROM ytem_product WHERE product_name = #{productName}
+		) 
+		AND user_id = #{userId}
+  </select>
+  
+  <select id="getStockCountByProductCode" parameterType="map" resultType="int">
+  	SELECT
+		COUNT(1)
+	FROM
+		ytem_stock 
+	WHERE
+		product_id IN 
+		( 
+			SELECT id FROM ytem_product WHERE product_code = #{productCode}
+		) 
+		AND user_id = #{userId}
+  </select>
+</mapper>

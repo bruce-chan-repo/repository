@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>授权页面</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<link rel="stylesheet" href="#getContext()/static/zTree/css/metroStyle/metroStyle.css" type="text/css">
+	<style type="text/css">
+		.bottom {
+			width: 100%;
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			text-align: center;
+			padding: 5px 0px;
+		}
+	</style>
+</head>
+<body>
+	<div class="tree-div">
+		<ul id="tree" class="ztree"></ul>
+	</div>
+	<div class="bottom">
+		<button class="layui-btn layui-btn-sm btn-ok">确定</button>		
+	</div>
+	
+	
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/zTree/js/jquery.ztree.core.js"></script>
+	<script type="text/javascript" src="#getContext()/static/zTree/js/jquery.ztree.excheck.js"></script>
+	<script type="text/javascript">
+		// zTree配置.
+		var setting = {
+			check: {
+				enable: true
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			}
+		};
+		
+		// 获取treeData
+		jQuery.ajax({
+			url: "#getContext()/role/getTreeData.do",
+			type: "get",
+			dataType: "json",
+			success: function( response ) {
+				// 初始化zTree
+				zTreeObj = jQuery.fn.zTree.init($("#tree"), setting, response);
+				
+				var nodes = zTreeObj.getNodes();
+				for (var i = 0; i < nodes.length; i++) {
+					console.info(nodes[i]);
+				}
+					
+				var nodes = "$!{haveNodes}";
+				var haveNodes = nodes.split(",");
+				console.info(nodes);
+				for (var i = 0; i < haveNodes.length; i++) {
+					console.info(haveNodes[i]);
+					var node = zTreeObj.getNodeByParam("id", haveNodes[i], null);
+					if (node == null) {
+						continue;
+					}
+					zTreeObj.checkNode(node, true, true);
+				}
+			},
+			error: function( response ) {
+				layer.msg("初始化树异常.");
+			}
+		});
+		
+		// 授权按钮点击。
+		$(".btn-ok").bind("click", function() {
+			var data = {};
+			
+			// 获取所有选中的节点.
+			var nodes = zTreeObj.getCheckedNodes();
+			for (var i = 0; i < nodes.length; i++) {
+				data["menuList[" + i + "].id"] = nodes[i].id;
+			}
+			
+			data["id"] = "$!{roleId}";
+			
+			jQuery.ajax({
+				url: "#getContext()/role/accreditToRole.do",
+				type: "post",
+				data: data,
+				success: function( response) {
+					layer.msg("授权成功");
+				},
+				error: function( response ) {
+					layer.msg("授权失败");
+				}
+			});
+		});
+	</script>
+</body>
+</html>

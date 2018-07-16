@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>菜单列表</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.btn-group{
+			margin-right: 5px;
+		}
+	</style>
+</head>
+<body>
+	<div class="btn-group">
+	  <button class="layui-btn layui-btn-sm menu-add" data-type="getCheckData">添加菜单</button>
+	  <button class="layui-btn layui-btn-sm layui-btn-primary menu-delete" data-type="isAll">删除</button>
+	</div>
+	
+	<div class="layui-form">
+		<table class="layui-table">
+			<colgroup>
+				<col width="150">
+				<col width="200">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th><input type="checkbox" lay-skin="primary" id="checkAll"></th>
+					<th>编号</th>
+					<th>菜单名称</th>
+					<th>父级菜单</th>
+					<th>访问路径</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+	</div>
+	<div id="pageHelper"></div>
+	<input type="hidden" id="currPage" value="1"/>
+	
+	<!-- JavaScript -->
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/js/common.js"></script>
+	
+	<script type="text/javascript">
+		$(function() {
+			// 添加菜单信息
+			$(".menu-add").bind("click", function() {
+				layer.open({
+					  type: 2,
+					  title: '添加菜单',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['520px', '320px'],
+					  content: '#getContext()/menu/toAddMenu.do',
+					  cancel: function(index, lerayo) {
+						  window.location.reload();
+					  }
+				});
+			});	
+			
+			// 修改菜单信息
+			$(document).on("click", ".menu-edit", function() {
+				var menuId = $(this).data("id");
+				
+				layer.open({
+					  type: 2,
+					  title: '编辑菜单',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['520px', '320px'],
+					  content: '#getContext()/menu/toEditMenu.do?id=' + menuId,
+					  cancel: function(index, lerayo) {
+						  window.location.reload();
+					  }
+				});
+			});
+			
+			// 删除菜单信息
+			$(".menu-delete").bind("click", function() {
+				var ids = "";					// 存储删除编号
+				var parentIds = "";				// 是否包含一级菜单
+				
+				$("tbody").find(":checked").each(function( index ) {
+					ids += "," + $(this).val();
+					
+					// 判断要删除的菜单中是否包含一级菜单.
+					if ($(this).data("parentid") === "") {
+						parentIds += "," + $(this).val();
+					}
+				});
+				
+				if (ids == "") {
+					layer.alert("请选择需要删除的菜单");					
+					return false;
+				}
+				
+				layer.confirm("确定删除菜单吗？", {
+				  btn: ["确定", "取消"]
+				}, function(){
+					ids = ids.substring(1);
+					
+					// 如果包含的话,需要友好提示
+					if ( parentIds ) {
+						layer.confirm("您删除的菜单中包含一级菜单,删除后该菜单的子菜单也会清空,继续吗？", {
+							  btn: ["确定", "取消"]
+						}, function() {
+							deleteMenus(ids, parentIds);
+						}, function() {
+							layer.close(layer.index);
+						})
+					} else {
+						deleteMenus(ids, parentIds);
+					}		
+				}, function() {
+					layer.close(layer.index);
+				});
+			});
+			
+			// 全选.
+			$(document).on("click", "#checkAll + div", function() {
+				var isChecked = $("#checkAll").is(":checked");
+				
+				$("tbody").find(":checkbox").prop("checked", isChecked);
+				
+				form.render('checkbox');
+			});
+			
+			toLoad();
+		});
+		
+		layui.use("form", function() {
+			form = layui.form;
+		});
+		
+		var i = 0;
+		// 加载分页信息.
+		function toLoad() {
+			var currPage = $("#currPage").val();
+			
+			var data = $("form").serializeObject();
+			data['curpage'] = currPage;
+			
+			$("tbody").empty();
+			
+			$("tbody").load("#getContext()/menu/menus.do", data);
+			
+			i++;
+		}
+		
+		// 删除菜单函数.
+		function deleteMenus( ids, parentIds ) {
+			jQuery.ajax({
+				url: "#getContext()/menu/deleteMenus.do",
+				type: "post",
+				data: {"menuIds": ids, "parentIds": parentIds},
+				dataType: "json",
+				async: false,
+				success: function( result ) {
+					layer.confirm(result.msg, {
+					  btn: ["确定"]
+					}, function(){
+					  layer.close(layer.index);
+					  window.location.reload();
+					});
+				},
+				error: function( result ) {
+					layer.confirm(result.msg, {
+					  btn: ["确定"]
+					}, function(){
+					  layer.close(layer.index);
+					  window.location.reload();
+					});
+				}
+			});
+		}
+	</script>
+</body>
+</html>

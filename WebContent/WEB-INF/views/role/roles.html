@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>角色列表</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.btn-group{
+			margin-right: 5px;
+		}
+	</style>
+</head>
+<body>
+	<div class="btn-group">
+	  <button class="layui-btn layui-btn-sm role-add" data-type="getCheckData">添加角色</button>
+	  <button class="layui-btn layui-btn-sm layui-btn-primary role-delete" data-type="isAll">删除</button>
+	</div>
+	
+	<div class="layui-form">
+		<table class="layui-table">
+			<colgroup>
+				<col width="150">
+				<col width="200">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th><input type="checkbox" lay-skin="primary" id="checkAll"></th>
+					<th>编号</th>
+					<th>角色名称</th>
+					<th>角色描述</th>
+					<th>是否可用</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+	</div>
+	<div id="pageHelper"></div>
+	<input type="hidden" id="currPage" value="1"/>
+
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			// 添加角色信息
+			$(".role-add").bind("click", function() {
+				layer.open({
+					  type: 2,
+					  title: '添加角色',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['520px', '300px'],
+					  content: '#getContext()/role/toAddRole.do',
+					  cancel: function(index, lerayo) {
+						  window.location.reload();
+					  }
+				});
+			});	
+			
+			// 编辑角色信息
+			$(document).on("click", ".role-edit", function() {
+				var roleId = $(this).data("id");
+				layer.open({
+					  type: 2,
+					  title: '编辑角色',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['520px', '300px'],
+					  content: '#getContext()/role/toEditRole.do?roleId=' + roleId,
+					  cancel: function(index, lerayo) {
+						  window.location.reload();
+					  }
+				});
+			});	
+			
+			// 删除角色信息
+			$(".role-delete").bind("click", function() {
+				var ids = "";
+				$("tbody").find(":checked").each(function( index ) {
+					ids += "," + $(this).val();
+				});
+				
+				if (ids == "") {
+					layer.alert("请选择需要删除的角色");					
+					return false;
+				}
+				
+				layer.confirm("确定删除角色吗？", {
+				  btn: ["确定", "取消"]
+				}, function(){
+					ids = ids.substring(1);
+					
+					jQuery.ajax({
+						url: "#getContext()/role/deleteRoles.do",
+						type: "post",
+						data: {"roleIds": ids},
+						dataType: "json",
+						async: false,
+						success: function( result ) {
+							layer.confirm(result.msg, {
+							  btn: ["确定"]
+							}, function(){
+							  layer.close(layer.index);
+							  window.location.reload();
+							});
+						},
+						error: function( result ) {
+							layer.confirm(result.msg, {
+							  btn: ["确定"]
+							}, function(){
+							  layer.close(layer.index);
+							  window.location.reload();
+							});
+						}
+					});
+				}, function() {
+					layer.close(layer.index);
+				});
+			});
+			
+			// 给角色授权
+			$(document).on("click", ".role-accredit", function() {
+				var roleId = $(this).data("id");
+				
+				layer.open({
+					  type: 2,
+					  title: '角色授权',
+					  shadeClose: true,
+					  shade: 0.2,
+					  area: ['260px', '300px'],
+					  content: '#getContext()/role/toAccredit.do?roleId=' + roleId
+				});
+			});	
+			
+			// 全选.
+			$(document).on("click", "#checkAll + div", function() {
+				var isChecked = $("#checkAll").is(":checked");
+				
+				$("tbody").find(":checkbox").prop("checked", isChecked);
+				
+				form.render('checkbox');
+			});
+			
+			toLoad();
+		});
+		
+		layui.use("form", function() {
+			form = layui.form;
+		});
+		
+		var i = 0;
+		// 加载分页信息.
+		function toLoad() {
+			var currPage = $("#currPage").val();
+			
+			var data = $("form").serializeObject();
+			data['curpage'] = currPage;
+			
+			$("tbody").empty();
+			
+			$("tbody").load("#getContext()/role/roles.do", data);
+			
+			i++;
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+#foreach($user in $!{pageInfo.list})
+<tr>
+	<td width="8%"><input type="checkbox" lay-skin="primary" value="$!{user.id}"></td>
+	<td width="8%">$!{user.id}</td>
+	<td>$!{user.username}</td>
+	<td>$!{user.realName}</td>
+	<td>$!{user.role.roleName}</td>
+	<td>$!{user.createTime}</td>
+	<td>
+		<button class="layui-btn layui-btn-sm user-edit" data-id="$!{user.id}">编辑</button>
+		<button class="layui-btn layui-btn-primary layui-btn-sm user-reset" data-id="$!{user.id}">重置密码</button>
+	</td>
+</tr>
+#end
+
+<script type="text/javascript">
+	// 保证分页插件只加载一次.
+	if (i == 1) {
+		layui.use('laypage', function(){
+		   var laypage = layui.laypage;
+		  
+		   //完整功能
+		   laypage.render({
+		     elem: 'pageHelper',
+		     count: '$!{pageInfo.total}',
+		     limit: '$!{pageInfo.pageSize}',
+		     layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip'],
+		     jump: function(obj, first){
+		    	 if (!first) {
+		    		 $("#currPage").val(obj.curr);
+			    	 toLoad();
+		    	 }
+		    	 
+		    	 return false;
+		     }
+		   });
+		});
+	}
+	
+	form.render('checkbox');
+</script>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>选择发货单</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		body{
+			padding: 8px;
+		}
+		button{
+			margin: 8px;
+		}
+	</style>
+</head>
+<body>
+	<div class="layui-upload">
+	  <button type="button" class="layui-btn layui-btn-normal" id="select-file"> 
+	  	<i class="layui-icon">&#xe67c;</i>
+	  	#if("$!{method}" == "into")
+	  		选择入库单
+	  	#else
+		  	选择发货单
+	  	#end
+  	  </button>
+  	  <span class="file-name"></span>
+	  <br/>
+	  <button type="button" class="layui-btn" id="import">开始读取</button>
+	</div>
+	
+	<!-- JavaScript -->
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript">
+	   // Param
+	   var data = {};	
+	
+	   layui.use('upload', function(){
+		  var upload = layui.upload; 
+		   
+		  // 选完文件后不自动上传
+		  upload.render({
+		    elem: '#select-file',
+		    url: '#getContext()/file/upload.do',
+		    auto: true,
+		    accept: "file",
+		    exts: "xls|xlsx",
+		    acceptMime: "file/xls,file/xlsx",
+		    done: function( res ){
+		    	if (res.code == "1") {
+			    	data.filePath = res.msg.split("|")[0];
+			    	data.fileName = res.msg.split("|")[1];
+			    	$(".file-name").html(data.fileName);
+			    	
+			    	layer.msg("上传文件成功");
+		    	} else {
+					layer.msg("上传文件失败");    		
+		    	}
+		    },
+		    error: function(index, upload) {
+		    	layer.msg("上传文件失败");	
+		    }
+		  });
+	   });
+	   
+	   // 导入事件触发
+	   $("#import").bind("click", function() {
+		   var fileName = $(".file-name").html();
+		   if (fileName == "") {
+			   layer.msg("请先选择文件");
+			   return false;
+		   }
+		   
+		   var index = layer.load(1, {
+			   shade: [0.1, "#fff"]
+		   });
+		   
+		   var method = "$!{method}";
+		   var url = "#getContext()/order/readOrder.do?userId=${userId}";
+		   // 判断是否是入库入口
+		   if (method == "into") {
+			   url = "#getContext()/order/readIntoRepository.do";
+		   }
+		   
+		   jQuery.ajax({
+			   url: url,
+			   type: "POST",
+			   data: data,
+			   success: function(response, status) {
+				  if (response.code == "1") {
+					  response.data["fileName"] = data.fileName;
+					  
+					  sessionStorage.data = JSON.stringify(response.data);
+					  var index = parent.layer.getFrameIndex(window.name);
+					  parent.layer.close(index);
+				  } else {
+					  layer.msg(response.msg);  
+				  }
+			   },
+			   error: function(response) {
+				  layer.close( index );
+			   	  layer.msg(response.msg);				   
+			   }
+		   });
+	   });
+	</script>
+</body>
+</html>

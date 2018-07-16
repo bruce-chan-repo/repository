@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ytem.repository.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.ytem.repository.bean.User">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="username" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="real_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="password" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="user_icon" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="question" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="answer" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="role_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="is_deleted" javaType="java.lang.Boolean" jdbcType="BIT" />
+      <arg column="create_time" javaType="java.lang.String"/>
+      <arg column="modified_time" javaType="java.lang.String"/>
+    </constructor>
+    <association property="role" javaType="Role" column="role_id" select="com.ytem.repository.dao.RoleMapper.selectByPrimaryKey"></association>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, username, real_name, password, user_icon, question, answer, role_id, is_deleted, create_time, 
+    modified_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ytem_sys_user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ytem_sys_user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ytem.repository.bean.User">
+    insert into ytem_sys_user (id, username, real_name, password, 
+      user_icon, question, answer, 
+      role_id, is_deleted, create_time, 
+      modified_time)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{userIcon,jdbcType=VARCHAR}, #{question,jdbcType=VARCHAR}, #{answer,jdbcType=VARCHAR}, 
+      #{roleId,jdbcType=INTEGER}, #{isDeleted,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifiedTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ytem.repository.bean.User">
+    insert into ytem_sys_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="realName != null">
+      	real_name,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="userIcon != null">
+        user_icon,
+      </if>
+      <if test="question != null">
+        question,
+      </if>
+      <if test="answer != null">
+        answer,
+      </if>
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+        create_time,
+        modified_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null">
+      	#{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="userIcon != null">
+        #{userIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="question != null">
+        #{question,jdbcType=VARCHAR},
+      </if>
+      <if test="answer != null">
+        #{answer,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null">
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=BIT},
+      </if>
+        NOW(),
+        NOW()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ytem.repository.bean.User">
+    update ytem_sys_user
+    <set>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null">
+      	real_name = #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="userIcon != null">
+        user_icon = #{userIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="question != null">
+        question = #{question,jdbcType=VARCHAR},
+      </if>
+      <if test="answer != null">
+        answer = #{answer,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null">
+        role_id = #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      modified_time = NOW()
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ytem.repository.bean.User">
+    update ytem_sys_user
+    set username = #{username,jdbcType=VARCHAR},
+      real_name = #{realName,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      user_icon = #{userIcon,jdbcType=VARCHAR},
+      question = #{question,jdbcType=VARCHAR},
+      answer = #{answer,jdbcType=VARCHAR},
+      role_id = #{roleId,jdbcType=INTEGER},
+      is_deleted = #{isDeleted,jdbcType=BIT},
+      modified_time = NOW()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectByUsername" parameterType="map" resultMap="BaseResultMap">
+  	SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		`ytem_sys_user`
+	WHERE
+		username = #{username}
+	<if test="id != null">
+	AND
+		id != #{id}
+	</if>
+	AND
+		is_deleted = 0;
+  </select>
+  
+  <select id="selectUserList" resultMap="BaseResultMap">
+ 	SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		`ytem_sys_user`
+	WHERE
+		is_deleted = 0
+  </select>
+  
+  <delete id="deleteUsers" parameterType="string">
+  	DELETE
+  		FROM
+  	`ytem_sys_user`
+  	WHERE
+  		id in(${userIds});
+  </delete>
+  
+  <select id="selectAllClients" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List"></include>
+  	FROM	
+  		ytem_sys_user
+  	WHERE
+  		role_id = (
+			SELECT id FROM ytem_sys_role WHERE role_name LIKE '%客户%'
+  		);
+  </select>
+</mapper>

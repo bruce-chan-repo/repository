@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>需要采购的货物</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+</head>
+<body style="padding: 5px;">
+	<fieldset class="layui-elem-field layui-field-title">
+	  <legend>需要采购产品数量</legend>
+	</fieldset>
+	#if($!{needPurchase.size()} == 0)
+		没有需要采购的产品
+	#else
+		<div class="layui-form">
+		  <table class="layui-table">
+		    <colgroup>
+		      <col width="150">
+		      <col width="150">
+		    </colgroup>
+		    <thead>
+		      <tr>
+		        <th>产品型号</th>
+		        <th>剩余数量</th>
+		      </tr> 
+		    </thead>
+		    <tbody>
+		      #foreach($stock in $!{needPurchase})
+		      <tr>
+		        <td>$!{stock.productName}</td>
+		        <td>$!{stock.rest}</td>
+		      </tr>
+		      #end
+		    </tbody>
+		  </table>
+		</div>
+	#end
+</body>
+</html>

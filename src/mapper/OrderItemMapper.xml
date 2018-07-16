@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ytem.repository.dao.OrderItemMapper">
+  <resultMap id="BaseResultMap" type="com.ytem.repository.bean.OrderItem">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="order_no" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+      <arg column="product_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="product_code" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="product_sequence" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="quantity" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="create_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+      <arg column="modified_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, order_no, product_name, product_code, product_sequence, quantity, create_time, modified_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ytem_order_item_${tableNumber}
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ytem_order_item_${tableNumber}
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ytem.repository.bean.OrderItem">
+    insert into ytem_order_item_${tableNumber} (id, product_name, product_code, 
+      product_sequence, quantity, create_time, 
+      modified_time)
+    values (#{id,jdbcType=INTEGER}, #{productName,jdbcType=VARCHAR}, #{productCode,jdbcType=VARCHAR}, 
+      #{productSequence,jdbcType=VARCHAR}, #{quantity,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifiedTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ytem.repository.bean.OrderItem">
+    insert into ytem_order_item_${tableNumber}
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="productName != null">
+        product_name,
+      </if>
+      <if test="productCode != null">
+        product_code,
+      </if>
+      <if test="productSequence != null">
+        product_sequence,
+      </if>
+      <if test="quantity != null">
+        quantity,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      modified_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="productName != null">
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productCode != null">
+        #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productSequence != null">
+        #{productSequence,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null">
+        #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      NOW()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ytem.repository.bean.OrderItem">
+    update ytem_order_item_9
+    <set>
+      <if test="productName != null">
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productCode != null">
+        product_code = #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productSequence != null">
+        product_sequence = #{productSequence,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null">
+        quantity = #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifiedTime != null">
+        modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ytem.repository.bean.OrderItem">
+    update ytem_order_item_9
+    set product_name = #{productName,jdbcType=VARCHAR},
+      product_code = #{productCode,jdbcType=VARCHAR},
+      product_sequence = #{productSequence,jdbcType=VARCHAR},
+      quantity = #{quantity,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <insert id="batchInsert" parameterType="Order">
+  	INSERT 
+  		INTO
+  	ytem_order_item_${tableNumber}
+  	(
+  		order_no,
+  		product_name, 
+  		product_code,
+  		product_sequence, 
+  		quantity, 
+  		create_time, 
+  		modified_time
+  	)
+  	VALUES
+  	<foreach collection="orderItems" item="orderItem" separator=",">
+  		(
+  			#{id},
+  			#{orderItem.productName},
+  			#{orderItem.productCode},
+  			#{orderItem.productSequence},
+  			#{orderItem.quantity},
+  			#{createTime},
+  			NOW()
+  		)
+  	</foreach>
+  </insert>
+  
+  <select id="selectOrderItems" parameterType="OrderItem" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List"></include>
+  	FROM
+  		ytem_order_item_${tableNumber}
+  	WHERE
+  		order_no = #{orderNo}
+  </select>
+</mapper>

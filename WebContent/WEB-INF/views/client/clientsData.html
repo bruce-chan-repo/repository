@@ -1,0 +1,38 @@
+#foreach($client in $!{pageInfo.list})
+<tr>
+	<td><input type="checkbox" lay-skin="primary" value="$!{client.id}" data-parentid="$!{client.id}"></td>
+	<td>$!{client.id}</td>
+	<td>$!{client.name}</td>
+	<td>$!{client.phone}</td>
+	<td>$!{client.remark}</td>
+	<td>$!{client.createTime}</td>
+	<td><button class="layui-btn layui-btn-sm client-edit" data-id="$!{client.id}">编辑</button></td>
+</tr>
+#end
+
+<script type="text/javascript">
+	// 保证分页插件只加载一次.
+	if (i == 1) {
+		layui.use('laypage', function(){
+		   var laypage = layui.laypage;
+		  
+		   //完整功能
+		   laypage.render({
+		     elem: 'pageHelper',
+		     count: '$!{pageInfo.total}',
+		     limit: '$!{pageInfo.pageSize}',
+		     layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip'],
+		     jump: function(obj, first){
+		    	 if (!first) {
+		    		 $("#currPage").val(obj.curr);
+			    	 toLoad();
+		    	 }
+		    	 
+		    	 return false;
+		     }
+		   });
+		});
+	}
+	
+	form.render('checkbox');
+</script>

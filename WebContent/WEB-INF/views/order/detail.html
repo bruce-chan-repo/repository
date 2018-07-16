@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>订单详情</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.layui-input-inline{
+			width: 250px!important;
+		}
+	</style>
+</head>
+<body>
+	<fieldset class="layui-elem-field">
+		<legend>订单信息</legend>
+		<div class="layui-field-box">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">合同号</label>
+					<div class="layui-input-inline">
+						<input type="text" name="orderNo" autocomplete="off"
+							class="layui-input" value="$!{order.orderNo}">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">联系人</label>
+					<div class="layui-input-inline">
+						<input type="text" name="customName" autocomplete="off"
+							class="layui-input" value="$!{order.customName}">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">日期</label>
+					<div class="layui-input-inline">
+						<input type="text" name="craeteTime" autocomplete="off"
+							class="layui-input" value="$!{order.createTime}">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">电话</label>
+					<div class="layui-input-inline">
+						<input type="text" name="customPhone" autocomplete="off"
+							class="layui-input" value="$!{order.customPhone}">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">发货公司</label>
+					<div class="layui-input-inline">
+						<input type="text" name="shipmentsCompany" lay-verify="date"
+							autocomplete="off" class="layui-input" value="$!{order.shipmentsCompany}">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">发货地址</label>
+					<div class="layui-input-inline">
+						<input type="text" name="shipmentsAddress" autocomplete="off"
+							class="layui-input" value="$!{order.shipmentsAddress}">
+					</div>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+	<fieldset class="layui-elem-field">
+		<legend>订单明细</legend>
+		<div class="layui-field-box">
+			<div class="layui-form">
+				<table class="layui-table" lay-filter="table">
+					<colgroup>
+					</colgroup>
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>型号</th>
+							<th>产品代码</th>
+							<th>序列号</th>
+							<th>数量</th>
+						</tr>
+					</thead>
+					<tbody>
+						#foreach($orderItem in $!{order.orderItems})
+						<tr>
+							<td>$!{orderItem.id}</td>
+							<td>$!{orderItem.productName}</td>
+							<td>$!{orderItem.productCode}</td>
+							<td>$!{orderItem.productSequence}</td>
+							<td>$!{orderItem.quantity}</td>
+						</tr>
+						#end
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</fieldset>
+</body>
+</html>

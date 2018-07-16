@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>商品销售</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.sequece{
+			width: 100%;
+			height: 20px;
+			border: none;
+		}
+		.company-select {
+			width: 240px!important;
+		}
+		.table-input{
+			height: 23px;
+			line-height: 23px;
+			width: 85%;
+			border: none;
+			padding: 5px 0px;
+		}
+		#clue_tbody tr td{
+			height: 20px;
+		    line-height: 20px;
+		    min-height: 15px;
+		    padding: 2px 15px;
+		}
+		#clue_con {
+			overflow:auto;
+			height: 220px;
+			min-height: 0px;
+		}
+		.split {
+			width: 30px;
+			height: 25px;
+			display: inline-block;
+		}
+		.order-base {
+			width: 290px;
+		}
+		.order-base div {
+			width: 210px!important;
+		}
+		.order-send {
+			width: 300px!important;
+		}
+		.layui-form-label {
+			width: 60px;
+			padding: 9px 10px;
+			padding-left: 0px;
+		}
+		.layui-form-item {
+			margin-bottom: 3px;
+		}
+		.layui-field-box {
+			padding: 8px 15px;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" action="#getContext()/order/mergeOrder.do" lay-filter="form">
+	<fieldset class="layui-elem-field">
+	  <legend>操作</legend>
+	  <div class="layui-field-box">
+	   <div class="layui-input-inline company-select">
+				<select name="userId" lay-verify="select" value="-1">
+					<option value="-1">请选择公司...</option>
+					#foreach($client in $!{clients})
+						<option value="$!{client.id}">$!{client.realName}</option>
+					#end
+				</select>
+		</div>
+		<span class="split"></span>
+		<button class="layui-btn layui-btn-primary btn-read">读取发货单</button>
+	    <button class="layui-btn btn-merge">合成发货单</button>
+	    <button class="layui-btn layui-btn-primary reset">重置</button>
+	  </div>
+    </fieldset>
+		<fieldset class="layui-elem-field">
+		  <legend>订单信息</legend>
+		  <div class="layui-field-box">
+				  <div class="layui-form-item">
+				    <div class="layui-inline order-base">
+				      <label class="layui-form-label">合同号</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="orderNo" autocomplete="off" class="layui-input">
+				      </div>
+				    </div>
+				    <div class="layui-inline order-base">
+				      <label class="layui-form-label">日期</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="createTime" autocomplete="off" class="layui-input">
+				      </div>
+				    </div>
+				    <div class="layui-inline order-base">
+				      <label class="layui-form-label">联系人</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="customName" autocomplete="off" class="layui-input">
+				      </div>
+				    </div>
+				    <div class="layui-inline order-base">
+				      <label class="layui-form-label">电话</label>
+				      <div class="layui-input-inline">
+				        <input type="text" name="customPhone" autocomplete="off" class="layui-input">
+				      </div>
+				    </div>
+				  </div>
+				  <div class="layui-form-item">
+				    <div class="layui-inline">
+				      <label class="layui-form-label">发货公司</label>
+				      <div class="layui-input-inline order-send">
+				        <input type="text" name="shipmentsCompany" lay-verify="date" autocomplete="off" class="layui-input">
+				      </div>
+				    </div>
+				    <div class="layui-inline">
+				      <label class="layui-form-label">发货地址</label>
+				      <div class="layui-input-inline order-send">
+				        <input type="text" name="shipmentsAddress" autocomplete="off" class="layui-input">
+				      </div>
+				    </div>
+				    <div class="layui-inline">
+					      <label class="layui-form-label">备注</label>
+					      <div class="layui-input-inline">
+					        <input type="text" name="remark" autocomplete="off" class="layui-input">
+					      </div>
+					</div>
+				  </div>
+				  <input type="hidden" value="" name="orderFile"/>
+				  <input type="hidden" value="" name="orderFileName">
+		  </div>
+		</fieldset>
+		<fieldset class="layui-elem-field">
+		  <legend>扫描区域</legend>
+		  <div class="layui-field-box">
+		  	 <textarea placeholder="扫描区域" class="layui-textarea scan-area"></textarea>
+		  </div>
+		</fieldset>
+		<fieldset class="layui-elem-field">
+		  <legend>订单明细</legend>
+		  <div class="layui-field-box" style="padding-top: 0px;">
+		  	  <div class="layui-form">
+				  <table class="layui-table" lay-filter="table" style="margin-bottom: 0px;">
+				  	<colgroup>
+						<col width="8%">
+						<col width="15%">
+						<col width="15%">
+						<col width="25%">
+						<col width="15%">
+						<col>
+					</colgroup>
+				    <thead>
+				      <tr>
+				        <th>序号</th>
+				        <th>型号</th>
+				        <th>产品代码</th>
+				        <th>序列号</th>
+				        <th>数量</th>
+				        <th>库存数量</th>
+				      </tr> 
+				    </thead>
+				</table>
+				<div class="layui-form-item" id="clue_con">
+					<table class="layui-table" style="margin-top:0px;">
+					<colgroup>
+						<col width="8%">
+						<col width="15%">
+						<col width="15%">
+						<col width="25%">
+						<col width="15%">
+						<col>
+					</colgroup>
+					<tbody id="clue_tbody">
+					
+					</tbody>
+					</table>
+				</div>
+			</div>
+		  </div>
+		</fieldset>
+	</form>
+	
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/js/common.js"></script>
+	
+	<script type="text/javascript">
+		// 记录每次扫描成功的一维码. 避免重复扫描
+		var repeatRecord = new Array();
+		var productMap = {};
+		
+		layui.use('table', function(){
+		  var table = layui.table;
+		});
+		
+		layui.use('form', function(){
+			form = layui.form;
+		});
+		
+		// 读取发货单
+		$(".btn-read").bind("click", function() {
+			var userId = $("select[name='userId']").val();
+			if (userId == -1) {
+				layer.msg("请选择订单所属公司");
+				return false;
+			}
+			
+			layer.open({
+				  type: 2,
+				  title: '选择发货单',
+				  shadeClose: true,
+				  shade: 0.2,
+				  area: ['500px', '180px'],
+				  content: '#getContext()/order/toRead.do?method=out&userId=' + userId,
+				  end: function() {
+					 // 重置表单.
+					 $(".reset").trigger("click"); 
+					 $("select[name='userId']").val(parseInt(userId));
+					 form.render('select');
+					 
+				  	 var data = JSON.parse(sessionStorage.data);
+				  	 
+				  	 var fileName = data.fileName;
+				  	 if (fileName != "") {
+						 $("input[name='orderFileName']").val(fileName);
+					 }
+				  	 
+				  	 $("input[name='orderNo']").val(data.orderNo);
+			  	     $("input[name='orderFile']").val(data.orderFile);
+				  	 $("input[name='createTime']").val(data.createTime);
+				  	 $("input[name='customName']").val(data.customName);
+				  	 $("input[name='customPhone']").val(data.customPhone);
+				  	 $("input[name='shipmentsCompany']").val(data.shipmentsCompany);
+				  	 $("input[name='shipmentsAddress']").val(data.shipmentsAddress);
+				  	 
+				  	 var orderItems = data.orderItems;
+				  	 for (var i = 0; i < orderItems.length; i++) {
+				  		 var html = $("<tr class='" + orderItems[i].productCode + "'>" + 
+								        "<td>" + (i + 1) + "</td>" +
+								        "<td><input type='hidden' name='orderItems[" + i + "].productName' value='" + orderItems[i].productName + "'/>" + orderItems[i].productName + "</td>" +
+								        "<td><input type='hidden' name='orderItems[" + i + "].productCode' value='" + orderItems[i].productCode + "' class='productCode'/>" + orderItems[i].productCode + "</td>" +
+								        "<td><input type='text' name='orderItems[" + i + "].productSequence' class='sequece table-input'/></td>" +
+								        "<td class='quantity'><input type='hidden' name='orderItems[" + i + "].quantity' value='" + orderItems[i].quantity + "'/>" + orderItems[i].quantity + "</td>" +
+								        "<td class='stock_number'>" + orderItems[i].restNumber + "</td>" +
+								    "</tr>");
+						 
+				  		 // 没有产品编号的说明是附件.
+						 if (orderItems[i].productCode == "-" || orderItems[i].productCode == "" || orderItems[i].quantity > 1) {
+							 html.find(".sequece").remove();
+						 }		    
+								    
+						 $("tbody").append(html);
+				  	 }
+				  	 
+				  	 sessionStorage.removeItem("data");
+				  }
+			});		
+			
+			return false;
+		});
+		
+		// 合成发货单点击
+		$(".btn-merge").bind("click", function() {
+			var orderFile = $("input[name='orderFile']").val();
+			if (orderFile == "") {
+				layer.msg("请先读取发货单");				
+				return false;
+			}
+			
+			if (!checkInput()) {
+				layer.msg("请完善发货序列号");
+				return false;
+			}
+			
+			var userId = $("select[name='userId']").val();
+			console.info(userId);
+			if (userId == -1) {
+				layer.msg("请选择订单所属公司");
+				return false;
+			}
+			
+			// 校验库存是否充足.
+			var outOfStack = false;
+			var $quantity = $(".quantity");
+			for (var i = 0; i < $quantity.length; i++) {
+				var shipmentQuantity = $quantity.eq(i);
+				var stockQuantity = $(".stock_number").eq(i);
+				
+				if (parseInt(shipmentQuantity.text()) > parseInt(stockQuantity.text())) {
+					shipmentQuantity.css("color", "red");
+					stockQuantity.css("color", "red");
+					
+					outOfStack = true;
+				}
+			}
+			
+			if ( outOfStack ) {
+				layer.msg("货单中有产品库存不足");
+				return false;
+			}
+			
+			$("form").submit();	
+			
+			// 置空表单
+			$(".reset").trigger("click"); 
+			
+			return false;
+		});
+		
+		// 重置表单
+		$(".reset").bind("click", function() {
+			$("form input").each(function() {
+				$(this).val("");
+			});
+			
+			$("tbody").empty();
+			
+			return false;
+		});
+		
+		// 监听扫描枪事件
+		$(".scan-area").bind("keydown", function( event ) {
+			var e = event || window.event;
+			
+			if (e.keyCode == 13) {
+				var value = $(this).val();
+				
+				var allValues = value.split("\n");
+				var nowValue = allValues[allValues.length - 1];
+				
+				// 判断该一维码是否已经扫过
+				if (jQuery.inArray(nowValue, repeatRecord) > -1) {
+					palyVoice();
+					return true;
+				}
+				
+				// 获取扫描的产品编码
+				var productCode = nowValue.substring(0, 9);
+				var element = $("tbody tr[class='" + productCode + "']");
+				if (element.length == 0) {
+					palyVoice();
+				} else {
+					var index = -1;
+					for(var i = 0; i < element.length; i++) {
+						var val = $(element[i]).find(".sequece").val();
+						if (val == "") {
+							index = i;
+							break;
+						}
+					}
+					
+					if (index == -1) {
+						palyVoice();
+					} else {
+						// 构建序列号
+						var sequece = nowValue.substring(12, 17);
+						var batchNumber = nowValue.substring(17, 19) + "." + nowValue.substring(19, 21);
+						$("tr[class='" + productCode + "']").eq(index).find(".sequece").val(sequece + "/" + batchNumber);
+					}
+				}
+				
+				repeatRecord.push( nowValue );
+			}
+		});
+		
+		function palyVoice() {
+			var audio = new Audio("#getContext()/static/voice/warning.mp3");
+			audio.play();
+		}
+		
+		// 验证输入
+		function checkInput() {
+			var isOk = true;
+			
+			var sequeces = $(".sequece");
+			for (var i = 0; i < sequeces.length; i++) {
+				var value = $(".sequece").eq(i).val();
+				if (value == "") {
+					isOk = false;
+					break;
+				}
+			}
+			
+			return isOk;
+		}
+		
+		// 获取产品代码
+		function getProductCode() {
+			$(".productCode").each(function(){
+				var productCode = $(this).val();
+				
+				if (productMap.hasOwnProperty(productCode)) {
+					productMap[productCode] += 1;
+				} else {
+					productMap[productCode] = 1;
+				}			
+			});
+		}
+	</script>
+</body>
+</html>

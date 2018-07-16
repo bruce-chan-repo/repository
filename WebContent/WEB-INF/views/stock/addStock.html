@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>添加库存</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<link rel="stylesheet" href="#getContext()/static/css/common.css">
+	<style type="text/css">
+		.layui-form{
+			margin: 10px;
+		}
+		.layui-form .layui-form-label{
+			width: 100px;
+		}
+		.layui-form .layui-input-inline{
+			width: 300px;			
+		}
+		.layui-form-item > span{
+			position: relative;
+			top: 8px;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" type="post" lay-filter="form">
+		<input type="hidden" name="id" id="stock-id" value="$!{stock.id}" />
+		<div class="layui-form-item">
+			<label class="layui-form-label">型号</label>
+			<div class="layui-input-inline">
+				<select name="productId" lay-verify="productId" value="-1">
+					<option value="-1">请选择型号...</option>
+					#foreach($product in $!{products})
+						<option value="$!{product.id}">$!{product.productName}</option>
+					#end
+				</select>
+			</div>
+		</div>
+		## admin
+		#if($!{currUser.role.id} == 1)
+			<div class="layui-form-item">
+				<label class="layui-form-label">所属客户</label>
+				<div class="layui-input-inline">
+					<select name="userId" lay-verify="userId" value="-1" >
+						<option value="-1">请选择公司...</option>
+						#foreach($client in $!{clients})
+							<option value="$!{client.id}">$!{client.realName}</option>
+						#end
+					</select>
+				</div>
+			</div>
+		#end
+		<div class="layui-form-item">
+			<label class="layui-form-label">序列号</label>
+			<div class="layui-input-inline">
+				<input type="text" name="sequence" placeholder="请输入产品序列号" autocomplete="off"
+					class="layui-input" >
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">产品状态</label>
+			<div class="layui-input-inline">
+				<select name="status" lay-verify="status" value="-1">
+					<option value="-1">请选择状态...</option>
+					<option value="1">正常</option>
+					<option value="2">破损</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">数量</label>
+			<div class="layui-input-inline">
+				<input type="text" name="quantity" 
+					placeholder="请输入数量" autocomplete="off" class="layui-input" lay-verify="quantity"/>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">批次号</label>
+			<div class="layui-input-inline">
+				<input type="text" name="batchNumber" 
+					placeholder="请输入批次号" autocomplete="off" class="layui-input" />
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">合同</label>
+			<div class="layui-input-inline">
+				<input type="text" name="contractNumber" 
+					placeholder="请输入合同号" autocomplete="off" class="layui-input" />
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">提单号</label>
+			<div class="layui-input-inline">
+				<input type="text" name="billNumber" 
+					placeholder="请输入提单号" autocomplete="off" class="layui-input" />
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-inline">
+				<input type="text" name="remark" 
+					placeholder="请输入备注" autocomplete="off" class="layui-input" />
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit>立即提交</button>
+				<button type="reset" class="layui-btn layui-btn-primary reset">重置</button>
+			</div>
+		</div>
+	</form>
+	
+	<!-- JavaScript -->
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="#getContext()/static/js/jquery.form.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		var stockId = $("#stock-id").val();
+	
+		layui.use('form', function(){
+			 form = layui.form;
+			 
+			 form.on('submit(form)', function( data ){
+				 var url = "#getContext()/stock/addStock.do";
+				 // 如果是编辑提交，则跳转到其他地址
+				 if (stockId != "") {
+					 url = "#getContext()/stock/editStock.do";
+				 }
+				 
+				 $("form").ajaxSubmit({
+					url: url,
+					type: "post",
+					dataType: "json",
+					success: function( result ) {
+						layer.msg( result.msg );
+						$(".reset").trigger("click");
+					},
+					error: function( result ) {
+						layer.msg( result.msg );
+						$(".reset").trigger("click");
+					}
+				 });
+				  
+				 return false;
+			 });  
+			 
+			 if (stockId != "") {
+				 
+			 }
+		});
+	</script>
+	<script type="text/javascript" src="#getContext()/static/js/layui.validate.ext.js"></script>
+	<script type="text/javascript">
+		 form.verify({
+			 sequence: function(value, item) {
+					var available = false;
+					jQuery.ajax({
+						url: "#getContext()/stock/checkSequenceIsUseable.do",
+						type: "post",
+						data: {"sequence": value, "productId": $("select[name='productId']").val()},
+						dataType: "json",
+						async: false,
+						success: function( result ) {
+							if (result.code == "1") {
+								available = true;
+							}
+						}
+					});
+					
+					if ( !available ) {
+						return "当前产品已经在库存中存在了";
+					}
+				}
+		 });
+	</script>
+</body>
+</html>

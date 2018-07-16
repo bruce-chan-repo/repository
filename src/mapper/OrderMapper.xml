@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ytem.repository.dao.OrderMapper">
+  <resultMap id="BaseResultMap" type="com.ytem.repository.bean.Order">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="order_no" javaType="java.lang.String" jdbcType="VARCHAR" />
+	  <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>      
+      <arg column="custom_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="custom_phone" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="shipments_company" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="shipments_address" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="remark" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="create_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+      <arg column="modified_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+    </constructor>
+    
+    <association property="user" javaType="User" column="user_id" select="com.ytem.repository.dao.UserMapper.selectByPrimaryKey"></association>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, order_no, user_id, custom_name, custom_phone, shipments_company, shipments_address, remark, 
+    create_time, modified_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ytem_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ytem_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ytem.repository.bean.Order">
+    insert into ytem_order (id, order_no, user_id, custom_name, 
+      custom_phone, shipments_company, shipments_address, 
+      remark, create_time, modified_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=BIGINT}, #{userId,jdbcType=INTEGER}, #{customName,jdbcType=VARCHAR}, 
+      #{customPhone,jdbcType=VARCHAR}, #{shipmentsCompany,jdbcType=VARCHAR}, #{shipmentsAddress,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{modifiedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ytem.repository.bean.Order" useGeneratedKeys="true" keyProperty="id">
+    insert into ytem_order
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="userId != null">
+      	user_id,
+      </if>
+      <if test="customName != null">
+        custom_name,
+      </if>
+      <if test="customPhone != null">
+        custom_phone,
+      </if>
+      <if test="shipmentsCompany != null">
+        shipments_company,
+      </if>
+      <if test="shipmentsAddress != null">
+        shipments_address,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      modified_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+      	#{userId,jdbcType=INTEGER},
+      </if>
+      <if test="customName != null">
+        #{customName,jdbcType=VARCHAR},
+      </if>
+      <if test="customPhone != null">
+        #{customPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="shipmentsCompany != null">
+        #{shipmentsCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="shipmentsAddress != null">
+        #{shipmentsAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      NOW()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ytem.repository.bean.Order">
+    update ytem_order
+    <set>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+      	user_id = #{userId, jdbcType=INTEGER},
+      </if>
+      <if test="customName != null">
+        custom_name = #{customName,jdbcType=VARCHAR},
+      </if>
+      <if test="customPhone != null">
+        custom_phone = #{customPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="shipmentsCompany != null">
+        shipments_company = #{shipmentsCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="shipmentsAddress != null">
+        shipments_address = #{shipmentsAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifiedTime != null">
+        modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ytem.repository.bean.Order">
+    update ytem_order
+    set order_no = #{orderNo,jdbcType=BIGINT},
+      user_id = #{userId, jdbcType=INTEGER},
+      custom_name = #{customName,jdbcType=VARCHAR},
+      custom_phone = #{customPhone,jdbcType=VARCHAR},
+      shipments_company = #{shipmentsCompany,jdbcType=VARCHAR},
+      shipments_address = #{shipmentsAddress,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectOrders" parameterType="Order" resultMap="BaseResultMap">
+  	<bind name="condition" value="'%' + customName + '%'"/>
+  	SELECT
+  		<include refid="Base_Column_List"/>
+  	FROM
+  		ytem_order
+  	<where>
+  		<if test="customName != null and customName != ''">
+  			(
+  				order_no LIKE #{condition}
+  				OR
+  				custom_name LIKE #{condition}
+  				OR
+  				custom_phone LIKE #{condition}
+  			)
+  		</if>
+  		<if test="createTime != null and createTime != ''">
+  			AND
+  			DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{createTime}
+  		</if>
+  		<if test="userId != null and userId != -1">
+  			AND
+  			user_id = #{userId}
+  		</if>
+  	</where>
+  </select>
+</mapper>

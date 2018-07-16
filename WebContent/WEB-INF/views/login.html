@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>伟亚星速仓库管理</title>
+	<link rel="stylesheet" href="#getContext()/static/css/login.css">
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	
+	<style type="text/css">
+		.message_error{
+			color: red;
+			position: relative;
+			left: 115px;
+			bottom: 8px;
+		}
+	</style>
+</head>
+<body>
+	<div class=background>
+		
+		<span class="title">
+			<img src="#getContext()/static/images/logo.jpg" width="50" height="35"/>
+			伟亚星速仓库管理
+		</span>
+	</div>
+	<div class="box">
+		<form class="layui-form" action="#getContext()/user/login.do" method="post">
+			<div class="layui-form-item">
+			    <label class="layui-form-label">用户名</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="username" lay-verify="username" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+			    </div>
+		    </div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">密码</label>
+			    <div class="layui-input-block">
+			       <input type="password" name="password" lay-verify="pass" placeholder="请输入密码" autocomplete="off" class="layui-input">
+			    </div>
+		    </div>
+		    <div class="layui-form-item">
+		    	<span class="message_error">$!{error}</span>
+		    </div>
+		    <div class="box-bottom">
+		        <div class="box-bottom-buttons">
+		        	<button type="button" class="layui-btn login" lay-submit="" lay-filter="demo1">登录</button>
+		       		<button type="reset" class="layui-btn layui-btn-primary reset">重置密码</button>
+		        </div>
+		    </div>
+		</form>
+	</div>
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="#getContext()/static/layui/layui.all.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			$(".login").click(function() {
+				// 校验输入
+				if (!checkInput()) {
+					return false;
+				}
+				
+				$("form").submit();
+			});	
+			
+			$("input").bind("keyup", function(e) {
+				if (e.keyCode == 13) {
+					$(".login").trigger("click");
+				}
+			});
+			
+			// 如果当前页面是在iframe中打开
+			if (window != top) {
+				top.location.href = location.href;
+			}
+		});
+		
+		// 校验输入
+		function checkInput() {
+			var username = $("input[name='username']").val();
+			if (username == "") {
+				$(".message_error").text("请输入用户名");
+				return false;
+			}
+			
+			var password = $("input[name='password']").val();
+			if (password == "") {
+				$(".message_error").text("请输入密码");
+				return false;
+			}
+			
+			return true;
+		}
+	</script>
+</body>
+</html>

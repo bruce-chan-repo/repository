@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>用户基本资料</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		body{
+			margin: 20px 20px 10px 0px;
+		}
+	</style>
+</head>
+<body>
+	<div class="layui-form-item">
+	    <label class="layui-form-label">用户名 :</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="username" lay-verify="username" value="$!{currUser.username}" autocomplete="off" class="layui-input" disabled="disabled">
+	    </div>
+    </div>
+    <div class="layui-form-item">
+	    <label class="layui-form-label">问题 :</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="username" lay-verify="username" value="$!{currUser.question}" autocomplete="off" disabled="disabled" class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-form-item">
+	    <label class="layui-form-label">答案 :</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="username" lay-verify="username" value="$!{currUser.answer}" autocomplete="off" disabled="disabled" class="layui-input">
+	    </div>
+    </div>
+    <div class="layui-form-item">
+	    <label class="layui-form-label">角色 :</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="username" lay-verify="username" value="$!{currUser.role.roleName}" autocomplete="off" class="layui-input" disabled="disabled">
+	    </div>
+    </div>
+</body>
+</html>

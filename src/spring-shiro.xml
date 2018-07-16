@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<description>shiro配置文件</description>
+	
+	<!-- 配置缓存管理器 -->
+	<bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<!-- 配置Ehcache配置文件 -->
+		<property name="cacheManagerConfigFile" value="classpath:ehcache-shiro.xml"/>
+	</bean>
+	
+	<!-- 配置shiro securityManage-->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="cacheManager" ref="cacheManager"></property>
+		<property name="sessionMode" value="native"></property>
+		<property name="realm" ref="myRealm"></property>
+		<property name="sessionManager" ref="sessionManager"></property>
+	</bean>
+	
+	<!-- 配置shiro sessionMananger -->
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="globalSessionTimeout" value="1800000"></property>
+	</bean>
+	
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager"></property>
+		<property name="loginUrl" value="/user/toLogin.do"></property>
+		<property name="successUrl" value="/manage/index.do"></property>
+		<property name="unauthorizedUrl" value="/user/toLogin.do"></property>
+		
+		<!-- 拦截器过滤链 -->
+		<property name="filterChainDefinitions">
+			<value>
+				/static/** = anon
+				/user/login.do = anon
+				/user/logout = logout
+				
+				/** = authc
+			</value>
+		</property>
+	</bean>
+	
+	<!-- 配置自定义Relam -->
+	<bean id="myRealm" class="com.ytem.repository.realms.MyRealm">
+		<property name="credentialsMatcher">
+			<bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+				<property name="hashAlgorithmName" value="MD5"></property>
+				<property name="hashIterations" value="1024"></property>
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- shiro生命周期处理. -->  
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+</beans>

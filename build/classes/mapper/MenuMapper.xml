@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ytem.repository.dao.MenuMapper">
+  <resultMap id="BaseResultMap" type="com.ytem.repository.bean.Menu">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="menu_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="parent_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="sort_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="url" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="menu_icon" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="create_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+      <arg column="modified_time" javaType="java.lang.String" jdbcType="TIMESTAMP" />
+    </constructor>
+    
+    <association property="parent" javaType="Menu" column="parent_id" select="selectByPrimaryKey"></association>
+    <collection property="children" javaType="list" column="id" select="selectChildByParentId"></collection>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, menu_name, parent_id, sort_id, url, menu_icon, create_time, modified_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ytem_sys_menu
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ytem_sys_menu
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ytem.repository.bean.Menu">
+    insert into ytem_sys_menu (id, menu_name, parent_id, 
+      sort_id, url, menu_icon, 
+      create_time, modified_time)
+    values (#{id,jdbcType=INTEGER}, #{menuName,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER}, 
+      #{sortId,jdbcType=INTEGER}, #{url,jdbcType=VARCHAR}, #{menuIcon,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{modifiedTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ytem.repository.bean.Menu">
+    insert into ytem_sys_menu
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="menuName != null">
+        menu_name,
+      </if>
+      <if test="parentId != null">
+        parent_id,
+      </if>
+      <if test="sortId != null">
+        sort_id,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="menuIcon != null">
+        menu_icon,
+      </if>
+       create_time,
+       modified_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="menuName != null">
+        #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="sortId != null">
+        #{sortId,jdbcType=INTEGER},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="menuIcon != null">
+        #{menuIcon,jdbcType=VARCHAR},
+      </if>
+      NOW(),
+      NOW()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ytem.repository.bean.Menu">
+    update ytem_sys_menu
+    <set>
+      <if test="menuName != null">
+        menu_name = #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="sortId != null">
+        sort_id = #{sortId,jdbcType=INTEGER},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="menuIcon != null">
+        menu_icon = #{menuIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+        modified_time = NOW()
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ytem.repository.bean.Menu">
+    update ytem_sys_menu
+    set menu_name = #{menuName,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=INTEGER},
+      sort_id = #{sortId,jdbcType=INTEGER},
+      url = #{url,jdbcType=VARCHAR},
+      menu_icon = #{menuIcon,jdbcType=VARCHAR},
+      modified_time = NOW()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 根据角色编号获取该角色所拥有的权限 -->
+  <select id="selectMenuByRoleId" parameterType="int" resultMap="BaseResultMap">
+  	SELECT
+		m.*
+	FROM
+		ytem_sys_role_menu r
+	INNER JOIN ytem_sys_menu m ON r.menu_id = m.id
+	WHERE
+		role_id = #{id}
+	ORDER BY m.sort_id
+  </select>
+  
+  <!-- 获取当前菜单的子节点 -->
+  <select id="selectChildByParentId" parameterType="int" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List"></include>
+  	FROM
+  		ytem_sys_menu
+  	WHERE 
+  		parent_id = #{id}
+  </select>
+  
+  <select id="selectMenuList" parameterType="menu" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List" />
+  	FROM
+  		ytem_sys_menu
+  </select>
+  
+  <delete id="batchDelete" parameterType="map">
+  	DELETE
+  		FROM
+  	ytem_sys_menu
+  	WHERE
+  		id IN (${menuIds})
+  </delete>
+  
+  <select id="selectMenuIsTop" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List" />
+  	FROM
+  		ytem_sys_menu
+  	WHERE
+  		parent_id = 0
+  	OR
+  		parent_id IS NULL
+  </select>
+  
+  <select id="getMenuByNameAndParentId" parameterType="Menu" resultMap="BaseResultMap">
+  	SELECT
+  		<include refid="Base_Column_List" />
+  	FROM	
+  		ytem_sys_menu
+  	WHERE
+  		menu_name = #{menuName}
+  	AND
+  		parent_id = #{parentId}
+  	AND 
+  		id != #{id}
+  </select>
+</mapper>

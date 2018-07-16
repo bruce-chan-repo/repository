@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>修改备注</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<link rel="stylesheet" href="#getContext()/static/css/common.css">
+	<style type="text/css">
+		body{
+			margin: 10px 20px 10px 0px;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" type="post" lay-filter="form">
+		<input type="hidden" name="id" value="$!{stock.id}"/>
+		
+		<div class="layui-form-item">
+			<label class="layui-form-label">产品状态</label>
+			<div class="layui-input-inline">
+				<select name="status" lay-verify="status" value="-1">
+					<option value="-1">请选择状态...</option>
+					<option value="1">正常</option>
+					<option value="2">破损</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-inline">
+				<input type="text" name="remark" value="$!{stock.remark}"
+					placeholder="请输入备注信息" autocomplete="off" class="layui-input" />
+			</div>
+		</div>
+		
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit>立即提交</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			</div>
+		</div>
+	</form>
+	
+	<!-- JavaScript -->
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="#getContext()/static/js/jquery.form.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		layui.use('form', function(){
+			 form = layui.form;
+			 
+			 form.on('submit(form)', function( data ){
+				 var url = "#getContext()/stock/remark.do";
+				 
+				 $("form").ajaxSubmit({
+					url: url,
+					type: "post",
+					dataType: "json",
+					success: function( result ) {
+						layer.msg( result.msg );
+					},
+					error: function( result ) {
+						layer.msg( result.msg );
+					}
+				 });
+				  
+				 return false;
+			 });  
+			 
+			 $("select").val("$!{stock.status}");
+			 form.render('select');
+		});
+	</script>
+</body>
+</html>

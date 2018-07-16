@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>商品入库</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.sequece{
+			width: 100%;
+			height: 20px;
+			border: none;
+		}
+		.layui-input-inline{
+			width: 300px!important;
+		}
+		.table-input{
+			height: 23px;
+			line-height: 23px;
+			width: 85%;
+			border: none;
+			padding: 5px 0px;
+		}
+		#clue_tbody tr td{
+			height: 20px;
+		    line-height: 20px;
+		    min-height: 15px;
+		    padding: 2px 15px;
+		}
+		#clue_con {
+			overflow:auto;
+			height: 330px;
+			min-height: 0px;
+		}
+		.split {
+			width: 30px;
+			height: 30px;
+			display: inline-block;
+		}
+		/* .custom-td {
+			padding: 0px !important;
+		} */
+	</style>
+</head>
+<body>
+	<form class="layui-form" lay-filter="form">
+	<fieldset class="layui-elem-field">
+	  <legend>操作</legend>
+	  <div class="layui-field-box">
+	  	<div class="layui-input-inline">
+			<select name="userId" lay-verify="select" value="-1">
+				<option value="-1">请选择公司...</option>
+				#foreach($client in $!{clients})
+					<option value="$!{client.id}">$!{client.realName}</option>
+				#end
+			</select>
+		</div>
+		<span class="split"></span>
+		<button class="layui-btn layui-btn-primary btn-read">读取入库单</button>
+	    <button class="layui-btn btn-into">入库</button>
+	    <button class="layui-btn layui-btn-primary reset">重置</button>
+	  </div>
+    </fieldset>
+	    <!-- <fieldset class="layui-elem-field">
+		  <legend>选择公司</legend>
+		  <div class="layui-field-box">
+			<div class="layui-input-inline">
+				<select name="userId" lay-verify="select" value="-1">
+					<option value="-1">请选择公司...</option>
+					#foreach($client in $!{clients})
+						<option value="$!{client.id}">$!{client.realName}</option>
+					#end
+				</select>
+			</div>
+		  </div>
+	    </fieldset> -->
+		<fieldset class="layui-elem-field">
+		  <legend>扫描区域</legend>
+		  <div class="layui-field-box">
+		  	 <textarea placeholder="扫描区域" class="layui-textarea scan-area"></textarea>
+		  </div>
+		</fieldset>
+		<fieldset class="layui-elem-field">
+		  <legend>入库明细</legend>
+		  <div class="layui-field-box">
+		  	  <div class="layui-form">
+				  <table class="layui-table" lay-filter="table" style="margin-bottom: 0px;margin-right: 8px;">
+				    <colgroup>
+				    	<col width="10%">
+						<col width="10%">
+						<col width="10%">
+						<col width="10%">
+						<col width="10%">
+						<col width="10%">
+						<col width="10%">
+						<col width="10%">
+						<col width="10%">
+						<col>
+				    </colgroup>
+				    <thead>
+				      <tr>
+				      	<th>序号</th>
+				        <th>型号</th>
+				        <th>产品代码</th>
+				        <th>序列号</th>
+				        <th>批次号</th>
+				        <th>合同号</th>
+				        <th>提单号</th>
+				        <th>到货日期</th>
+				        <th>备注</th>
+				        <th>状态</th>
+				      </tr> 
+				    </thead>
+				</table>
+				<div class="layui-form-item" id="clue_con">
+					<table class="layui-table" style="margin-top:0px;">
+					<tbody id="clue_tbody">
+					
+					</tbody>
+					</table>
+				</div>
+			</div>
+		  </div>
+		</fieldset>
+	</form>
+	<input type="hidden" value="" name="orderFile"/>
+	
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/js/jquery.form.js"></script>
+	<script type="text/javascript" src="#getContext()/static/js/common.js"></script>
+	
+	<script type="text/javascript">
+		// 记录每次扫描成功的一维码. 避免重复扫描
+		var repeatRecord = new Array();
+	
+		layui.use('table', function(){
+		  var table = layui.table;
+		});
+		
+		// 读取发货单
+		$(".btn-read").bind("click", function() {
+			layer.open({
+				  type: 2,
+				  title: '选择入库单',
+				  shadeClose: true,
+				  shade: 0.2,
+				  area: ['500px', '180px'],
+				  content: '#getContext()/order/toRead.do?method=into',
+				  end: function() {
+					 // 重置表单.
+					 $(".reset").trigger("click");
+					 
+					 var sessionData = sessionStorage.data;
+					 if (sessionData == "" || sessionData == undefined) {
+						 return false;
+					 }
+					 
+					 // 解析sessionStorage中的值.
+				  	 var data = JSON.parse( sessionData );
+				  	 
+				  	 var importStocks = data.importStocks;
+				  	 
+				  	 if (importStocks && importStocks.length > 0) {
+				  		$("input[name='orderFile']").val("已上传");
+				  	 }
+				  	 
+				  	 for (var i = 0; i < importStocks.length; i++) {
+				  		// 计算产品一维码
+				  		var productCode = importStocks[i].productCode + "000";
+						var sequence = importStocks[i].sequence;
+						var batchNumber = importStocks[i].batchNumber.replace(".", "");
+						 
+						var code = productCode + sequence + batchNumber;
+				  		 
+					  	var html = $("<tr class='" + code + "'>" + 
+					  					"<td width='10%'>" + (i + 1) + "</td>" +
+								        "<td width='10%'><input type='hidden' name='productName' value='" + importStocks[i].productName + "'/>" + importStocks[i].productName + "</td>" +
+								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='productCode' value='" + importStocks[i].productCode + "' class='productCode'/></td>" +
+								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='sequence' value='" + importStocks[i].sequence + "'/></td>" +
+								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='batchNumber' value='" + importStocks[i].batchNumber + "'/></td>" +
+								        "<td width='10%'><input type='hidden' name='contractNumber' value='" + importStocks[i].contractNumber + "'/>" + importStocks[i].contractNumber + "</td>" +
+								        "<td width='10%'><input type='hidden' name='billNumber' value='" + importStocks[i].billNumber + "'/>" + importStocks[i].billNumber + "</td>" +
+								        "<td width='10%'><input type='hidden' name='importDate' value='" + importStocks[i].importDate + "'/><input type='hidden' name='arrivalDate' value='" + importStocks[i].arrivalDate + "'/>" + importStocks[i].arrivalDate + "</td>" +
+								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='remark' value='" + importStocks[i].remark + "'/></td>" +
+								        "<td class='status'></td>" +
+								    "</tr>");
+								    
+						 $("tbody").append(html);
+				  	 }
+				  	 sessionStorage.removeItem("data");
+				  }
+			});		
+			
+			return false;
+		});
+		
+		// 入库点击事件.
+		$(".btn-into").bind("click", function() {
+			var orderFile = $("input[name='orderFile']").val();
+			if (orderFile == "") {
+				layer.msg("请先读取入库单");				
+				return false;
+			}
+			
+			if ($("select[name='userId']").val() == "-1") {
+				layer.msg("请选择所属公司");				
+				return false;
+			}
+			
+			if ( !checkIsValid() ) {
+				layer.confirm('您入库单中有未通过验证的产品,是否入库？', {
+					btn: ['确定','取消'] 
+				}, function(){
+					ajaxForm();
+				}, function(){
+					
+				});
+			} else {
+				ajaxForm();
+			}
+			
+			return false;
+		});
+		
+		function ajaxForm() {
+			var jsonArray = $("form").serializeArray(); 
+			
+			// 处理成josn数组
+			var array = new Array();
+			var temp = new Object();
+			for (var int = 0; int < jsonArray.length; int++) {
+				var object = jsonArray[int];
+				temp[object.name] = object.value;
+				
+				if (object.name == "remark") {
+					array.push(temp);
+					temp = new Object();
+				}
+			}
+			
+			// 构建请求数据.
+			var data = new Object();
+			data["stocks"] = array;
+			
+			var requestData = JSON.stringify(data);
+			
+			jQuery.ajax({
+				url: "#getContext()/order/intoRepository.do",
+				type: "post",
+				dataType: "json",
+				data: {"stockPackJson": requestData},
+				success: function( result ) {
+					layer.msg( result.msg );
+					$(".reset").trigger("click");
+				},
+				error: function( result ) {
+					layer.msg( result.msg );
+				}
+			 });
+			
+			 /* $("form").ajaxSubmit({
+				url: "#getContext()/order/intoRepository.do",
+				type: "post",
+				dataType: "json",
+				success: function( result ) {
+					layer.msg( result.msg );
+				},
+				error: function( result ) {
+					layer.msg( result.msg );
+				}
+			 }); */
+		}
+		
+		// 重置表单
+		$(".reset").bind("click", function() {
+			$(".scan-area").val("");
+			$("tbody").empty();
+			$("input[name='orderFile']").val("");
+			
+			return false;
+		});
+		
+		// 监听扫描枪事件
+		$(".scan-area").bind("keydown", function( event ) {
+			var e = event || window.event;
+			
+			if (e.keyCode == 13) {
+				var value = $(this).val();
+				
+				var allValues = value.split("\n");
+				var nowValue = allValues[allValues.length - 1];
+				
+				// 判断该一维码是否已经扫过
+				if (jQuery.inArray(nowValue, repeatRecord) > -1) {
+					palyVoice();
+					return true;
+				}
+				
+				var element = $("tbody tr[class='" + nowValue + "']");
+				if (element.length == 0) {
+					palyVoice();
+				} else {
+					var status = "<i class='layui-icon layui-icon-face-smile' style='font-size: 30px; color: green;'>&#xe605;</i>";
+					$("tbody tr[class='" + nowValue + "']").find(".status").append(status);
+				}
+				
+				repeatRecord.push( nowValue );
+			}
+		});
+		
+		function palyVoice() {
+			var audio = new Audio("#getContext()/static/voice/warning.mp3");
+			audio.play();
+		}
+		
+		// 验证输入
+		function checkIsValid() {
+			var stockItem = $("tbody tr");
+			var successItem = $("tbody tr .status i");
+			
+			// 说明成功没有全部通过
+			if (successItem.length != stockItem.length) {
+				return false;
+			}
+			
+			return true;
+		}
+	</script>
+</body>
+</html>

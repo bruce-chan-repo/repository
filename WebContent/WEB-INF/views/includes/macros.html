@@ -1,0 +1,197 @@
+
+##截取字符串，当超长时按指定长度截取
+#macro(subString $content $length)
+	#if($!length > 0 && $!{content.length()} > $!length)
+		$content.substring(0,$length)...
+	#else
+		$content
+	#end
+#end
+
+##格式化时间：自己指定格式
+#macro(formatDate $time $format)
+#if($time)
+$date.format($format,$date.toDate("yyyy-MM-dd HH:mm:ss.SSS",$time))
+#else
+
+#end
+#end
+
+##格式化时间：长格式    yyyy-MM-dd HH:mm:ss
+#macro(formatDateLong $time)
+#if($time.length() > 19 )$date.format("yyyy-MM-dd HH:mm:ss",$date.toDate("yyyy-MM-dd HH:mm:ss.SSS",$time))#else $time #end
+#end
+
+##格式化时间：短格式    yyyy-MM-dd
+#macro(formatDateShort $time)
+#if($time)$date.format("yyyy-MM-dd",$date.toDate("yyyy-MM-dd HH:mm:ss.SSS",$time))#else #end
+#end
+
+##格式化数字,自定义格式
+#macro(formatNumber $numberStr $format)
+	#if($numberStr)
+		## 当velocity参数包含#时有问题，用其他符号，后台进行替换 ###0.00--->@@@0.00
+		$!commonhelper.formatNumber($numberStr, $format)
+	#else
+
+	#end
+#end
+
+##格式化数字:长格式，包含两位小数
+#macro(formatNumberLong $numberStr)
+#if($numberStr)$number.format("#0.00", $numberStr)#else #end
+#end
+
+##格式化数字:短格式，不包含小数
+#macro(formatNumberShort $numberStr)
+#if($numberStr)$number.integer($numberStr)#else #end
+#end
+
+##数字转换成汉字
+#macro(toChineseChar $numberStr)
+	#if($numberStr)
+		$!commonhelper.toChineseChar($numberStr)
+	#else
+
+	#end
+#end
+
+##截取字符串，当超长时按指定长度截取,截取过的字符串，鼠标放上时显示整个字符串
+#macro(subStringWithTitle $content $length)
+	#if($!length > 0 && $!{content.length()} > $!length)
+		<font title="$content">$content.substring(0,$length)...</font>
+	#else
+		$!content
+	#end
+#end
+
+##向页面添加token标记
+#macro(token)
+	#set($tokenName = ${request.getAttribute("pzdf_token_name")})
+	<input type="hidden" name="pzdf_token_name" value="$tokenName" />
+	<input type="hidden" name="$tokenName" value='${request.getAttribute($tokenName)}' />
+#end
+
+##向页面添加getContext方法,返回项目路径 形如:  /BOSS
+#macro(getContext)$rootPath.getContextPath()#end
+
+##向页面添加urlRoot方法，返回服务器地址 形如: http://localhost:8080/BOSS
+#macro(urlRoot)$rootPath.getRoot()$rootPath.getContextPath()#end
+
+##去除字符串中的html标签
+#macro(removeHtmlTag $content)
+	#if($content)
+		$webUtils.removeHtmlTag($content)
+	#else
+		$!content
+	#end
+#end
+
+## 获取文件图标，参数可传：文件地址、文件名、后缀
+#macro(getFileIcon $url)
+	#if($url)
+		## 取后缀
+		#if($url.lastIndexOf('/')>1)
+			#set($startIndex = $url.lastIndexOf('.') + 1)
+			#set($suffix =$url.substring($startIndex,$url.length()))
+		#else
+			#set($suffix = $url)
+		#end
+		
+		## 判断后缀格式
+		#if($suffix == 'chm')
+			#getContext()/static/images/fileicon/chm.gif
+		#elseif($suffix == 'doc')
+			#getContext()/static/images/fileicon/doc.gif
+		#elseif($suffix == 'docx')
+			#getContext()/static/images/fileicon/docx.gif
+		#elseif($suffix == 'exe')
+			#getContext()/static/images/fileicon/exe.gif
+		#elseif($suffix == 'htm')
+			#getContext()/static/images/fileicon/htm.gif
+		#elseif($suffix == 'html')
+			#getContext()/static/images/fileicon/html.gif
+		#elseif($suffix == 'mdb')
+			#getContext()/static/images/fileicon/mdb.gif
+		#elseif($suffix == 'pdf')
+			#getContext()/static/images/fileicon/pdf.gif
+		#elseif($suffix == 'ppt')
+			#getContext()/static/images/fileicon/ppt.gif
+		#elseif($suffix == 'pptx')
+			#getContext()/static/images/fileicon/pptx.gif
+		#elseif($suffix == 'rar')
+			#getContext()/static/images/fileicon/rar.gif
+		#elseif($suffix == 'txt')
+			#getContext()/static/images/fileicon/txt.gif
+		#elseif($suffix == 'xls')
+			#getContext()/static/images/fileicon/xls.gif
+		#elseif($suffix == 'xlsx')
+			#getContext()/static/images/fileicon/xlsx.gif
+		#elseif($suffix == 'zip')
+			#getContext()/static/images/fileicon/zip.gif
+		#else
+			#getContext()/static/images/fileicon/unknow.gif
+		#end
+		
+	#else
+	#end
+#end
+
+## 获取文件柜文件图标，参数可传：文件地址、文件名、后缀
+#macro(getFileCabinetIcon $url)
+	#if($url)
+		## 取后缀
+		#if($url.lastIndexOf('/')>1)
+			#set($startIndex = $url.lastIndexOf('.') + 1)
+			#set($suffix =$url.substring($startIndex,$url.length()))
+		#else
+			#set($suffix = $url)
+		#end
+		
+		## 判断后缀格式
+		#if($suffix == 'doc')
+			#getContext()/static/images/filecabineticon/doc.png
+		#elseif($suffix == 'docx')
+			#getContext()/static/images/filecabineticon/doc.png
+		#elseif($suffix == 'mdb')
+			#getContext()/static/images/filecabineticon/mdb.png
+		#elseif($suffix == 'pdf')
+			#getContext()/static/images/filecabineticon/pdf.png
+		#elseif($suffix == 'ppt')
+			#getContext()/static/images/filecabineticon/ppt.png
+		#elseif($suffix == 'pptx')
+			#getContext()/static/images/filecabineticon/ppt.png
+		#elseif($suffix == 'png')
+			#getContext()/static/images/filecabineticon/png.png
+		#elseif($suffix == 'txt')
+			#getContext()/static/images/filecabineticon/txt.png
+		#elseif($suffix == 'xls')
+			#getContext()/static/images/filecabineticon/xlsx.png
+		#elseif($suffix == 'xlsx')
+			#getContext()/static/images/filecabineticon/xlsx.png
+		#elseif($suffix == 'zip')
+			#getContext()/static/images/filecabineticon/zip.png
+		#elseif($suffix == 'psd')
+			#getContext()/static/images/filecabineticon/psd.png
+		#else
+			#getContext()/static/images/filecabineticon/unknow.png
+		#end
+		
+	#else
+	#end
+#end
+
+## 获取当前版本
+#macro(getVersion)$!commonhelper.getCurrVersion()#end
+## 获取当前环境 unknown=0,dev=1,test=2,product=3
+#macro(getEnv)$!commonhelper.getCurrEnv()#end
+#macro(getPlattype)$!commonhelper.getCurrPlatType()#end
+
+## 格式化文件大小
+#macro(formatFileSize $size)$!commonhelper.formatFileSize($size)#end
+
+#macro(decodeEmoji $html)
+#if($html)
+$!commonhelper.decodeEmoji($html)
+#end
+#end
