@@ -27,6 +27,8 @@
 		<property name="maxIdle" value="${jdbc.maxIdle}"></property>
 		<!-- 最长的等待时间 -->
 		<property name="maxWait" value="${jdbc.maxWait}"></property>
+		<property name="validationQuery" value="SELECT 1"></property>
+		<property name="testOnBorrow" value="true"></property>
 	</bean> 
 	
 	<!-- 配置sqlSession -->
