@@ -230,7 +230,7 @@ public class OrderController {
     		newRow.createCell(3);
 
     		// 合并单元格
-    		sheet.addMergedRegion(new CellRangeAddress(maxRow, maxRow, 2, 3));
+    		sheet.addMergedRegion(new CellRangeAddress(maxRow + 1, maxRow + 1, 2, 3));
     		
     		// 处理订单信息
     		orderService.saveOrder(order);

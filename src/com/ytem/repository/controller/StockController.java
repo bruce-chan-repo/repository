@@ -1,11 +1,20 @@
 package com.ytem.repository.controller;
 
+import java.lang.reflect.InvocationTargetException;
+import java.net.URLEncoder;
 import java.util.List;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -376,5 +385,84 @@ public class StockController {
 		}
 		
 		return result;
+	}
+	
+	
+	/**
+	 * 导出库存信息.
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping("export")
+	public void exportStock(HttpServletRequest request, HttpServletResponse response) {
+		response.reset();
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/ms-excel");
+        response.setHeader("Content-type", "application/x-msexcel");
+        
+        try {
+        	ServletOutputStream sos = response.getOutputStream();
+        	
+            // 设置文件名称，因为header中不能包含中文，所以需要转换使用URLEncoder转换.
+            String fileName = URLEncoder.encode("库存信息", "UTF-8");
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+            
+            // 获取数据
+            List<Stock> stocks = stockService.getStocks();
+            
+            // 创建工作簿
+            HSSFWorkbook wb = new HSSFWorkbook();
+            
+            // 向excel中构建数据.
+            buildExcel(wb, stocks);
+            
+            wb.write(sos);
+            sos.flush();
+            sos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("异常信息-导出库存信息异常", e);
+		}
+	}
+	
+	/**
+	 * 构建导出的excel
+	 * @param workbook
+	 */
+	private void buildExcel(HSSFWorkbook workbook, List<Stock> stocks) {
+		// 创建sheet
+		HSSFSheet sheet = workbook.createSheet("商品库存.");
+		
+		// 构建表头
+		String[] coloums = {"型号,prodcut.productName", "产品代码,product.productCode", "序列号,sequence", "批次号,batchNumber", 
+							"数量,quantity", "入库日期,createTime"};
+		
+		HSSFRow row = sheet.createRow(0);
+		for (int i = 0; i < coloums.length; i++) {
+			String value = coloums[i].split(",")[0];
+			
+			HSSFCell cell = row.createCell(i);
+			cell.setCellValue(value);
+		}
+		
+		// 构建列
+		int size = stocks == null ? 0 : stocks.size();
+		for (int i = 0; i < size; i++) {
+			HSSFRow tempRow = sheet.createRow(i + 1);
+			Stock tempStock = stocks.get(i);
+			
+			for (int j = 0; j < coloums.length; j++) {
+				String property = coloums[j].split(",")[1];
+				String value = "";
+				try {
+					value = BeanUtils.getProperty(tempStock, property);
+				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+					e.printStackTrace();
+				}
+				
+				HSSFCell cell = tempRow.createCell(i);
+				cell.setCellValue(value);
+			}
+		}
 	}
 }
