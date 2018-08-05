@@ -39,7 +39,7 @@ public interface StockMapper {
      * 获取所有库存信息.
      * @return
      */
-    List<Stock> getStocks();
+    List<Stock> getStocks(@Param("userId") Integer userId);
     
 	/**
 	 * 批量添加
@@ -55,11 +55,17 @@ public interface StockMapper {
     List<Stock> selectNeedPurchase();
     
     /**
-     * 批量修改库存出售信息.
+     * 处理库存数量.
+     * @return
+     */
+    int dealWithQuantity(Order order);
+    
+    /**
+     * 修改库存数量为0的库存为出售状态.
      * @param order
      * @return
      */
-    int batchUpdateStatus(Order order);
+    int batchUpdateStatus();
     
     /**
      * 获取某个产品的库存数量.
@@ -87,7 +93,7 @@ public interface StockMapper {
      * @param productCode
      * @return
      */
-    int getStockCountByProductCode(Map<String, Object> paramMap);
+    List<Integer> getStockCountByProductCode(Map<String, Object> paramMap);
     
     /**
      * 获取某个产品的库存数量.
@@ -95,4 +101,11 @@ public interface StockMapper {
      * @return
      */
     Stock getStockCountByProductName(Map<String, Object> paramMap);
+    
+    /**
+     * 根据产品编号获取产品数量.
+     * @param productId
+     * @return
+     */
+    int getProductStockCount(Integer productId);
 }

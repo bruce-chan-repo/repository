@@ -25,10 +25,10 @@
 	<form class="layui-form" type="post" lay-filter="form">
 		<input type="hidden" name="id" id="stock-id" value="$!{stock.id}" />
 		<div class="layui-form-item">
-			<label class="layui-form-label">型号</label>
+			<label class="layui-form-label">产品名称</label>
 			<div class="layui-input-inline">
 				<select name="productId" lay-verify="productId" value="-1">
-					<option value="-1">请选择型号...</option>
+					<option value="-1">请选择产品名称...</option>
 					#foreach($product in $!{products})
 						<option value="$!{product.id}">$!{product.productName}</option>
 					#end
@@ -53,7 +53,7 @@
 			<label class="layui-form-label">序列号</label>
 			<div class="layui-input-inline">
 				<input type="text" name="sequence" placeholder="请输入产品序列号" autocomplete="off"
-					class="layui-input" >
+					class="layui-input" value="$!{stock.sequence}">
 			</div>
 		</div>
 		<div class="layui-form-item">
@@ -69,35 +69,35 @@
 		<div class="layui-form-item">
 			<label class="layui-form-label">数量</label>
 			<div class="layui-input-inline">
-				<input type="text" name="quantity" 
+				<input type="text" name="quantity" value="$!{stock.quantity}"
 					placeholder="请输入数量" autocomplete="off" class="layui-input" lay-verify="quantity"/>
 			</div>
 		</div>
 		<div class="layui-form-item">
 			<label class="layui-form-label">批次号</label>
 			<div class="layui-input-inline">
-				<input type="text" name="batchNumber" 
+				<input type="text" name="batchNumber" value="$!{stock.batchNumber}"
 					placeholder="请输入批次号" autocomplete="off" class="layui-input" />
 			</div>
 		</div>
 		<div class="layui-form-item">
 			<label class="layui-form-label">合同</label>
 			<div class="layui-input-inline">
-				<input type="text" name="contractNumber" 
+				<input type="text" name="contractNumber" value="$!{stock.contractNumber}"
 					placeholder="请输入合同号" autocomplete="off" class="layui-input" />
 			</div>
 		</div>
 		<div class="layui-form-item">
 			<label class="layui-form-label">提单号</label>
 			<div class="layui-input-inline">
-				<input type="text" name="billNumber" 
+				<input type="text" name="billNumber" value="$!{stock.billNumber}"
 					placeholder="请输入提单号" autocomplete="off" class="layui-input" />
 			</div>
 		</div>
 		<div class="layui-form-item">
 			<label class="layui-form-label">备注</label>
 			<div class="layui-input-inline">
-				<input type="text" name="remark" 
+				<input type="text" name="remark" value="$!{stock.remark}"
 					placeholder="请输入备注" autocomplete="off" class="layui-input" />
 			</div>
 		</div>
@@ -144,8 +144,23 @@
 			 });  
 			 
 			 if (stockId != "") {
+				 $("select[name='productId']").val("$!{stock.productId}");
+				 $("select[name='status']").val("$!{stock.status}");
 				 
+				 if ("$!{currUser.role.id}" == "1") {
+					 $("select[name='userId']").val("$!{stock.userId}");
+				 }
+				 
+				 form.render('select');
 			 }
+		});
+		
+		$(".reset").bind("click", function(){
+			$("input").each(function(){
+				$(this).val("");
+			});
+			
+			return false;
 		});
 	</script>
 	<script type="text/javascript" src="#getContext()/static/js/layui.validate.ext.js"></script>

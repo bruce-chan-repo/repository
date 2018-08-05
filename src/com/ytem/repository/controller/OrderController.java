@@ -18,7 +18,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -34,6 +36,7 @@ import com.ytem.repository.bean.ImportStocksPack;
 import com.ytem.repository.bean.Order;
 import com.ytem.repository.bean.OrderItem;
 import com.ytem.repository.bean.User;
+import com.ytem.repository.common.Const;
 import com.ytem.repository.common.JsonResult;
 import com.ytem.repository.common.PageInfoExt;
 import com.ytem.repository.common.ResponseCode;
@@ -223,21 +226,18 @@ public class OrderController {
     		// 填充备注
     		int maxRow = sheet.getLastRowNum();
     		
-    		Row newRow = sheet.createRow(maxRow + 1);
+    		Row newRow = sheet.createRow(++maxRow);
     		
     		Cell newCell = newRow.createCell(2);
     		newCell.setCellValue(order.getRemark());
     		newRow.createCell(3);
 
     		// 合并单元格
-    		sheet.addMergedRegion(new CellRangeAddress(maxRow + 1, maxRow + 1, 2, 3));
+    		sheet.addMergedRegion(new CellRangeAddress(maxRow, maxRow, 2, 3));
     		
     		// 处理订单信息
     		orderService.saveOrder(order);
     		
-    		// TODO 删除数量为0的订单信息
-    		
-            
             wb.write(sos);
             sos.flush();
             sos.close();
@@ -323,6 +323,35 @@ public class OrderController {
 		
 		mv.addObject("clients", clients);
 		return mv;
+	}
+	
+	/**
+	 * 验证密码是否正确
+	 * @return
+	 */
+	@RequestMapping("validPassword.do")
+	@ResponseBody
+	public JsonResult<String> checkPasswordIsValid(HttpServletRequest request, String password) {
+		JsonResult<String> result = new JsonResult<>(ResponseCode.ERROR.getCode(), "密码输入错误");
+		
+		// 获取当前登录的用户.
+		Subject subject = SecurityUtils.getSubject();
+		String username = subject.getPrincipal().toString();
+		
+		// 获取用户信息
+		User currUser = (User) request.getSession().getAttribute(username);
+		
+		// 盐值
+		ByteSource salt = ByteSource.Util.bytes(currUser.getUsername());
+		
+		// 对密码进行加密
+		SimpleHash simpHash = new SimpleHash(Const.HASH_ALGORITHMNAME, password, salt, Const.HASH_ITERATIONS);
+		
+		if (currUser.getPassword().equals(simpHash.toString())) {
+			result = new JsonResult<>(ResponseCode.SUCCESS.getCode(), "密码输入正确");
+		}
+		
+		return result;
 	}
 	
 	@InitBinder

@@ -103,22 +103,44 @@
 				layer.confirm("确定删除菜单吗？", {
 				  btn: ["确定", "取消"]
 				}, function(){
-					ids = ids.substring(1);
-					
-					// 如果包含的话,需要友好提示
-					if ( parentIds ) {
-						layer.confirm("您删除的菜单中包含一级菜单,删除后该菜单的子菜单也会清空,继续吗？", {
-							  btn: ["确定", "取消"]
-						}, function() {
+					layer.prompt({title: '请输入您的密码', formType: 1}, function(pass, index){
+					    var isPass = false;
+					    
+					    jQuery.ajax({
+							 url: "#getContext()/order/validPassword.do",
+							 type: "post",
+							 data: {"password": pass},
+							 dataType: "json",
+							 async: false,
+							 success: function( result ) {
+								 if (result.code == "1") {
+									 isPass = true;
+								 }
+							 }
+					    });
+						 
+						if ( !isPass ) {
+							layer.msg("密码输入错误");
+							return false;
+						}
+						layer.close(index);
+						ids = ids.substring(1);
+						
+						// 如果包含的话,需要友好提示
+						if ( parentIds ) {
+							layer.confirm("您删除的菜单中包含一级菜单,删除后该菜单的子菜单也会清空,继续吗？", {
+								  btn: ["确定", "取消"]
+							}, function() {
+								deleteMenus(ids, parentIds);
+							}, function() {
+								layer.close(layer.index);
+							})
+						} else {
 							deleteMenus(ids, parentIds);
-						}, function() {
-							layer.close(layer.index);
-						})
-					} else {
-						deleteMenus(ids, parentIds);
-					}		
-				}, function() {
-					layer.close(layer.index);
+						}		
+					}, function() {
+						layer.close(layer.index);
+					});
 				});
 			});
 			

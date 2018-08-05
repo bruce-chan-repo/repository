@@ -8,11 +8,14 @@
 	<td>$!{stock.quantity}</td>
 	<td>$!{stock.batchNumber}</td>
 	<td>$!{stock.contractNumber}</td>
-	<td>$!{stock.billNumber}</td>
+	<!-- <td>$!{stock.billNumber}</td> -->
 	<td>$!{stock.createTime}</td>
-	<td>$!{stock.user.realName}</td>
-	<td>$!{stock.remark}</td>
-	<td><button class="layui-btn layui-btn-sm layui-btn-primary stock-edit" data-id="$!{stock.id}">备注</button></td>
+	<td >$!{stock.user.realName}</td>
+	<td title="$!{stock.remark}">#subString($!{stock.remark}, 8)</td>
+	<td>
+		<!-- <button class="layui-btn layui-btn-sm layui-btn-primary stock-remark" data-id="$!{stock.id}">备注</button> -->
+		<button class="layui-btn layui-btn-sm layui-btn-primary stock-edit" data-id="$!{stock.id}">修改</button>
+	</td>
 </tr>
 #end
 

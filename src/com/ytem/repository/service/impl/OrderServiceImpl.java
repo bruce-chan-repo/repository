@@ -1,5 +1,6 @@
 package com.ytem.repository.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -54,15 +55,14 @@ public class OrderServiceImpl implements OrderService {
 		order.setTableNumber(order.getId() % 10);
 		result += orderItemMapper.batchInsert(order);
 		
-		// step 3: 将库存状态置为出售状态
-		result += stockMapper.batchUpdateStatus(order);
+		//result += stockMapper.dealWithQuantity(order);
 		
-		// step 4: 将配件减库存.
+		// step 3: 减库存.
 		List<OrderItem> orderItems = order.getOrderItems();
 		int size = orderItems.size();
 		for (int i = 0; i < size; i++) {
 			OrderItem orderItem = orderItems.get(i);
-			// 判断是否是配件.
+			
 			if ("-".equals(orderItem.getProductCode()) || StringUtils.isEmpty(orderItem.getProductCode())) {
 				// 查询该配件的数量.
 				Stock stock = new Stock();
@@ -74,8 +74,22 @@ public class OrderServiceImpl implements OrderService {
 				
 				stock.setQuantity(newQuantity);
 				stockMapper.updateQuantiyByCondition(stock);
+			} else {
+				int quantity = orderItem.getQuantity();
+				
+				Order tempOrder = new Order();
+				tempOrder.setId(quantity);    // 辅助存储数量
+				
+				List<OrderItem> items = new ArrayList<>();
+				items.add(orderItem);
+				
+				tempOrder.setOrderItems(items);
+				stockMapper.dealWithQuantity(tempOrder);
 			}
 		}
+		
+		// step 5: 将库存为0的库存删除.
+		result += stockMapper.batchUpdateStatus();
 		
 		logger.debug(opreation + ".|完成");
 		return result;

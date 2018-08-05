@@ -89,15 +89,15 @@
 			// 查看订单详情.
 			$(document).on("click", ".seach-detail", function() {
 				var id = $(this).data("id");
-				
-				layer.open({
+				window.location.href = '#getContext()/order/detail.do?id=' + id;
+				/* layer.open({
 					  type: 2,
 					  title: '订单详情',
 					  shadeClose: true,
 					  shade: 0.2,
 					  area: ['1300px', '700px'],
 					  content: '#getContext()/order/detail.do?id=' + id
-				});
+				}); */
 			});
 			
 			// 筛选按钮点击事件

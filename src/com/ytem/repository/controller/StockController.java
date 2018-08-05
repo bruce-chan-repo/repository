@@ -2,6 +2,7 @@ package com.ytem.repository.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletOutputStream;
@@ -15,6 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ import com.ytem.repository.common.ResponseCode;
 import com.ytem.repository.service.ProductService;
 import com.ytem.repository.service.StockService;
 import com.ytem.repository.service.UserService;
+import com.ytem.repository.utils.DateTimeUtil;
+import com.ytem.repository.utils.ExportUtil;
 import com.ytem.repository.utils.ImportHanler;
 
 /**
@@ -157,7 +161,6 @@ public class StockController {
 			if (currUser.getRole().getId() != 1) {
 				stock.setUserId(currUser.getId());
 			}
-			
 			
 			int row = stockService.addStock(stock);
 			if (row > 0) {
@@ -312,13 +315,27 @@ public class StockController {
 	 * @return
 	 */
 	@RequestMapping("toEditStock.do")
-	public ModelAndView toEditStock(Stock stock) {
+	public ModelAndView toEditStock(Stock stock, HttpServletRequest request) {
 		ModelAndView mv = new ModelAndView("/stock/addStock");
 		
 		// 查询库存信息.
 		Stock stockVo = stockService.getStockByCondition(stock);
 		
+		// 查询产品信息.
+		List<Product> products = productService.getProducts();
+		
+		// 查询所有的客户.
+		List<User> clients = userService.getAllClients();
+		
+		// 获取用户信息
+		Subject subject = SecurityUtils.getSubject();
+		String username = subject.getPrincipal().toString();
+		User currUser = (User) request.getSession().getAttribute(username);
+		
 		mv.addObject("stock", stockVo);
+		mv.addObject("clients", clients);
+		mv.addObject("products", products);
+		mv.addObject("currUser", currUser);
 		return mv;
 	}
 	
@@ -387,14 +404,28 @@ public class StockController {
 		return result;
 	}
 	
+	/**
+	 * 跳转到导出页面.
+	 * @return
+	 */
+	@RequestMapping("toExport.do")
+	public ModelAndView toExport() {
+		ModelAndView mv = new ModelAndView("/stock/exportStock");
+		
+		// 查询所有的客户.
+		List<User> clients = userService.getAllClients();
+		
+		mv.addObject("clients", clients);
+		return mv;
+	}
 	
 	/**
 	 * 导出库存信息.
 	 * @param request
 	 * @param response
 	 */
-	@RequestMapping("export")
-	public void exportStock(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping("export.do")
+	public void exportStock(Integer userId, HttpServletRequest request, HttpServletResponse response) {
 		response.reset();
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/ms-excel");
@@ -404,11 +435,11 @@ public class StockController {
         	ServletOutputStream sos = response.getOutputStream();
         	
             // 设置文件名称，因为header中不能包含中文，所以需要转换使用URLEncoder转换.
-            String fileName = URLEncoder.encode("库存信息", "UTF-8");
+            String fileName = URLEncoder.encode("库存信息.xls", "UTF-8");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName);
             
             // 获取数据
-            List<Stock> stocks = stockService.getStocks();
+            List<Stock> stocks = stockService.getStocks(userId);
             
             // 创建工作簿
             HSSFWorkbook wb = new HSSFWorkbook();
@@ -434,18 +465,14 @@ public class StockController {
 		HSSFSheet sheet = workbook.createSheet("商品库存.");
 		
 		// 构建表头
-		String[] coloums = {"型号,prodcut.productName", "产品代码,product.productCode", "序列号,sequence", "批次号,batchNumber", 
-							"数量,quantity", "入库日期,createTime"};
+		String[] coloums = {"型号,product.productName", "产品代码,product.productCode", "序列号,sequence", "批次号,batchNumber", 
+							"数量,quantity", "入库日期,createTime", "备注,remark"};
 		
 		HSSFRow row = sheet.createRow(0);
-		for (int i = 0; i < coloums.length; i++) {
-			String value = coloums[i].split(",")[0];
-			
-			HSSFCell cell = row.createCell(i);
-			cell.setCellValue(value);
-		}
+		ExportUtil.buildColumnHeader(workbook, row, coloums);
 		
 		// 构建列
+		CellStyle valueStyle = ExportUtil.getValueStyle(workbook);
 		int size = stocks == null ? 0 : stocks.size();
 		for (int i = 0; i < size; i++) {
 			HSSFRow tempRow = sheet.createRow(i + 1);
@@ -456,13 +483,26 @@ public class StockController {
 				String value = "";
 				try {
 					value = BeanUtils.getProperty(tempStock, property);
+					if (property.equals("createTime")) {
+						Date date = DateTimeUtil.string2Date(value);
+						value = DateTimeUtil.date2String(date, "yyyy-MM-dd HH:mm:dd");
+					}
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 					e.printStackTrace();
 				}
 				
-				HSSFCell cell = tempRow.createCell(i);
+				HSSFCell cell = tempRow.createCell(j);
 				cell.setCellValue(value);
+				cell.setCellStyle(valueStyle);
 			}
 		}
+		
+		sheet.setColumnWidth(0, 5500);
+		sheet.setColumnWidth(1, 5000);
+		sheet.setColumnWidth(2, 4000);
+		sheet.setColumnWidth(3, 4000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 6500);
+		sheet.setColumnWidth(6, 6000);
 	}
 }

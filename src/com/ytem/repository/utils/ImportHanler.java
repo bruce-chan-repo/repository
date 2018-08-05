@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -151,6 +153,13 @@ public class ImportHanler {
 		result.setArrivalDate(arrivalDate);
 		
 		cell = row.getCell(9);
+		String quantity = getCellValueByCell(cell);
+		if (StringUtils.isEmpty(quantity) || "0".equals(quantity)) {
+			quantity = "1";
+		}
+		result.setQuantity(quantity);
+		
+		cell = row.getCell(10);
 		String remark = getCellValueByCell(cell);
 		result.setRemark(remark);
 		
@@ -182,7 +191,7 @@ public class ImportHanler {
 	private Map<String, Stock> getExistsStocks(StockService stockService) {
 		Map<String, Stock> map = new HashMap<>();
 		
-		List<Stock> stocks = stockService.getStocks();
+		List<Stock> stocks = stockService.getStocks(null);
 		int size = stocks.size();
 		
 		for (int i = 0; i < size; i++) {
@@ -261,6 +270,11 @@ public class ImportHanler {
 			
 			ImportStock tempStock = buidImportStock(row);
 			
+			// 如果Excel中没有产品型号和产品代码， 认为该行是空行.
+			if (StringUtils.isEmpty(tempStock.getProductName()) && StringUtils.isEmpty(tempStock.getProductCode())) {
+				continue;
+			}
+			
 			finalList.add(tempStock);
 		}
 		
@@ -306,10 +320,12 @@ public class ImportHanler {
 			// 解析订单明细信息.
 			String productCode = getCellValueByCell(row.getCell(2));
 			String productName = getCellValueByCell(row.getCell(1));
+			String productSequence = getCellValueByCell(row.getCell(3));
 			
 			OrderItem temp = new OrderItem();
 			temp.setProductName(productName);
 			temp.setProductCode(productCode);
+			temp.setProductSequence(productSequence);
 			temp.setQuantity(Integer.parseInt(getCellValueByCell(row.getCell(4))));
 			
 			String stockMapKey = productName.replace(" ", "") + productCode;
@@ -344,6 +360,14 @@ public class ImportHanler {
 		String shipments = getCellValueByCell(row.getCell(8));
 		
 		// 拆分用户信息.
+		if (!custom.contains("\n")) {
+			custom = extractReplace(custom);
+		}
+		
+		if (!shipments.contains("\n")) {
+			shipments = extractReplace(shipments);
+		}
+		
 		String[] customInfos = custom.split("\n");
 		String[] shipmentInfos = shipments.split("\n");
 		
@@ -368,5 +392,11 @@ public class ImportHanler {
 		
 		return resolverOrder;
 	}
-	
+
+	private static String extractReplace(String custom) {
+		Pattern pattern = Pattern.compile("\\s{2,}");
+		Matcher matcher = pattern.matcher(custom);
+		custom = matcher.replaceAll("\n");
+		return custom;
+	}
 }

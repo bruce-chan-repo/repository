@@ -45,4 +45,11 @@ public interface UserMapper {
      * @return
      */
     List<User> selectAllClients();
+    
+    /**
+     * 根据角色编号获取对应的用户数量
+     * @param roleId
+     * @return
+     */
+    int getCountByRoleId(Integer roleId);
 }

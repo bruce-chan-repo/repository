@@ -121,6 +121,9 @@
       <if test="productId != null">
         product_id = #{productId,jdbcType=INTEGER},
       </if>
+      <if test="userId != null">
+      	user_id = #{userId, jdbcType=INTEGER},
+      </if>
       <if test="sequence != null">
         sequence = #{sequence,jdbcType=VARCHAR},
       </if>
@@ -129,6 +132,18 @@
       </if>
       <if test="remark != null">
         remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNumber != null and batchNumber != ''">
+      	batch_number = #{batchNumber},
+      </if>
+      <if test="contractNumber != null and contractNumber != ''">
+      	contract_number = #{contractNumber},
+      </if>
+      <if test="billNumber != null and billNumber != ''">
+      	bill_number = #{billNumber},
+      </if>
+      <if test="quantity != null">
+      	quantity = #{quantity, jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -151,7 +166,6 @@
   </update>
   
   <select id="selectStocks" parameterType="Stock" resultMap="BaseResultMap">
-  	<bind name="productName" value="'%' + product.productName + '%'"/>
   	SELECT
   		y.*
   	FROM
@@ -160,7 +174,8 @@
   		ytem_product p
   	ON y.product_id = p.id
   	<where>
-  		<if test="product.productName != null">
+  		<if test="product.productName != null and product.productName != ''">
+  			<bind name="productName" value="'%' + product.productName + '%'"/>
   		   (p.product_name LIKE #{productName}
   			OR
   			p.product_code LIKE #{productName}
@@ -197,11 +212,29 @@
   	limit 1
   </select>
   
-  <select id="getStocks" resultMap="BaseResultMap">
+  <select id="getProductStockCount" parameterType="int" resultType="int">
+  	SELECT
+  		COUNT(1)
+  	FROM	
+  		ytem_stock
+  	WHERE
+  		product_id = #{productId}
+  	AND
+  		is_sold = 0
+  </select>
+  
+  <select id="getStocks" parameterType="map" resultMap="BaseResultMap">
   	SELECT
   		<include refid="Base_Column_List"></include>
   	FROM
   		ytem_stock
+  	<where>
+  		<if test="userId != null">
+  			user_id = #{userId}
+  		</if>
+  		AND
+  			is_sold = 0
+  	</where>
   </select>
   
   <insert id="batchInsert" parameterType="list">
@@ -213,6 +246,7 @@
   		user_id,
   		sequence,
 		remark,
+		quantity,
 		batch_number,
 		contract_number,
 		bill_number,
@@ -228,6 +262,7 @@
   			#{stock.userId},
   			#{stock.sequence},
   			#{stock.remark},
+  			#{stock.quantity},
   			#{stock.batchNumber},
   			#{stock.contractNumber},
   			#{stock.billNumber},
@@ -265,20 +300,36 @@
 		COUNT(1) <![CDATA[ < ]]> 15;
   </select>
   
-  <update id="batchUpdateStatus" parameterType="Order">
+  <update id="dealWithQuantity" parameterType="Order">
   	UPDATE
 		`ytem_stock` a
 	INNER JOIN
 		`ytem_product` b
 	ON a.product_id = b.id
 	SET
-		a.is_sold = 1
+		a.quantity = (a.quantity - #{id})
 	WHERE	
 		CONCAT(b.product_code, a.sequence, '/', a.batch_number)
 	IN
 	<foreach collection="orderItems" item="orderItem" open="(" close=")" separator=",">
-		CONCAT(#{orderItem.productCode}, #{orderItem.productSequence})
+		<choose>
+			<when test='orderItem.productSequence == "" or orderItem.productSequence == "-" or orderItem.productSequence == null'>
+				CONCAT(#{orderItem.productCode}, a.sequence, '/')
+			</when>
+			<otherwise>
+				CONCAT(#{orderItem.productCode}, #{orderItem.productSequence})
+			</otherwise>
+		</choose>
 	</foreach>
+  </update>
+  
+  <update id="batchUpdateStatus">
+  	UPDATE
+		`ytem_stock`
+	SET
+		is_sold = 1
+	WHERE	
+		quantity = 0
   </update>
   
   <select id="getQuantityByCondition" parameterType="Stock" resultType="int">
@@ -325,11 +376,12 @@
 			SELECT id FROM ytem_product WHERE product_name = #{productName}
 		) 
 		AND user_id = #{userId}
+		AND is_sold = 0
   </select>
   
   <select id="getStockCountByProductCode" parameterType="map" resultType="int">
   	SELECT
-		COUNT(1)
+		quantity
 	FROM
 		ytem_stock 
 	WHERE
@@ -338,5 +390,6 @@
 			SELECT id FROM ytem_product WHERE product_code = #{productCode}
 		) 
 		AND user_id = #{userId}
+		AND is_sold = 0
   </select>
 </mapper>

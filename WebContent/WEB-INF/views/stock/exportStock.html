@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>导出库存</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.layui-form{
+			margin-top: 20px;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" action="#getContext()/stock/export.do">
+		<div class="layui-form-item">
+    		<label class="layui-form-label">选择客户: </label>
+			<div class="layui-input-inline">
+				<select name="userId" lay-verify="select" value="-1">
+					<option value="-1">请选择客户...</option>
+					#foreach($client in $!{clients})
+						<option value="$!{client.id}">$!{client.realName}</option>
+					#end
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"></label>
+			<div class="layui-input-inline">
+				<button type="button" class="layui-btn">开始导出</button>
+			</div>
+		</div>
+	</form>
+	
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		layui.use("form", function() {
+			form = layui.form;
+		});
+		
+		$(function(){
+			$(".layui-btn").bind("click", function(){
+				var value = $("select[name='userId']").val();
+				
+				if (value == "-1") {
+					layer.msg("请选择需要导出库存的公司");
+					return false;
+				}
+				
+				$("form").submit();
+			});
+		})
+	</script>
+</body>
+</html>

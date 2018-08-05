@@ -1,6 +1,7 @@
 package com.ytem.repository.controller;
 
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -21,13 +22,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ytem.repository.bean.Product;
 import com.ytem.repository.bean.Role;
+import com.ytem.repository.bean.Stock;
 import com.ytem.repository.bean.User;
 import com.ytem.repository.common.Const;
 import com.ytem.repository.common.JsonResult;
 import com.ytem.repository.common.PageInfoExt;
 import com.ytem.repository.common.ResponseCode;
 import com.ytem.repository.service.RoleService;
+import com.ytem.repository.service.StockService;
 import com.ytem.repository.service.UserService;
 
 
@@ -42,6 +46,9 @@ public class UserController {
 	
 	@Resource
 	private RoleService roleService;
+	
+	@Autowired
+	private StockService stockService;
 	
 	@RequestMapping("login.do")
 	public ModelAndView login(@RequestParam("username") String username, 
@@ -221,6 +228,27 @@ public class UserController {
 		JsonResult result;
 		
 		try {
+			if (StringUtils.isBlank(userIds)) {
+				result = new JsonResult(ResponseCode.ERROR.getCode(), "缺少参数");
+				return result;
+			}
+			
+			// 先校验该用户名下是否存在关联的库存信息.
+			StringTokenizer tokenizer = new StringTokenizer(userIds, ",");
+			while (tokenizer.hasMoreElements()) {
+				String userId = (String) tokenizer.nextElement();
+				
+				Stock condition = new Stock();
+				condition.setProductName("");
+				condition.setUserId(Integer.parseInt(userId));
+				condition.setProduct(new Product());
+				
+				PageInfoExt<Stock> pageInfo = stockService.getStocks(condition, 1, 10);
+				if (pageInfo != null && pageInfo.getList() != null && pageInfo.getList().size() > 0) {
+					return new JsonResult(ResponseCode.ERROR.getCode(), "该用户还关联有库存商品，不能删除");
+				}
+			}
+			
 			int row = userService.deleteUsers(userIds);
 			if (row > 0) {
 				result = new JsonResult(ResponseCode.SUCCESS.getCode(), "删除用户成功");

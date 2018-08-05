@@ -40,7 +40,7 @@ public interface StockService {
 	 * 获取所有的库存信息.
 	 * @return
 	 */
-	List<Stock> getStocks();
+	List<Stock> getStocks(Integer userId);
 	
 	/**
 	 * 批量添加
@@ -82,4 +82,11 @@ public interface StockService {
      * @return
      */
     Stock getStockCountByProductCode(String productCode, Integer userId, String productName);
+    
+    /**
+     * 根据产品编号获取产品数量.
+     * @param productId
+     * @return
+     */
+    int getProductStockCount(Integer productId);
 }

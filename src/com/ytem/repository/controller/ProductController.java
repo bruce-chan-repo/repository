@@ -1,5 +1,7 @@
 package com.ytem.repository.controller;
 
+import java.util.StringTokenizer;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import com.ytem.repository.common.JsonResult;
 import com.ytem.repository.common.PageInfoExt;
 import com.ytem.repository.common.ResponseCode;
 import com.ytem.repository.service.ProductService;
+import com.ytem.repository.service.StockService;
 
 /**
  * 产品控制层.
@@ -29,6 +32,9 @@ public class ProductController {
 	
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private StockService stockService;
 	
 	
 	/**
@@ -153,7 +159,19 @@ public class ProductController {
 				return result;
 			}
 			
-			// 执行添加操作.
+			// 先校验该商品是否有引用的库存
+			StringTokenizer tokenizer = new StringTokenizer(productIds, ",");
+			while (tokenizer.hasMoreElements()) {
+				String productId = (String) tokenizer.nextElement();
+				int count = stockService.getProductStockCount(Integer.parseInt(productId));
+				
+				if (count > 0) {
+					result = new JsonResult(ResponseCode.ERROR.getCode(), "删除的产品中还存在库存，不可删除");
+					return result;
+				}
+			}
+			
+			// 执行删除操作.
 			int row = productService.deleteProducts(productIds);
 			
 			if (row > 0) {

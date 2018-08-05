@@ -196,4 +196,15 @@
 			SELECT id FROM ytem_sys_role WHERE role_name LIKE '%客户%'
   		);
   </select>
+  
+  <select id="getCountByRoleId" parameterType="int" resultType="int">
+  	SELECT
+  		COUNT(1)
+  	FROM	
+  		ytem_sys_user
+  	WHERE
+  		role_id = #{roleId}
+  	AND
+  		is_deleted = 0
+  </select>
 </mapper>

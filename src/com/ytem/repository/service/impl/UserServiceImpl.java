@@ -108,4 +108,15 @@ public class UserServiceImpl implements UserService {
 		logger.debug(opreation + ".|结束");
 		return clients;
 	}
+
+	@Override
+	public int getCountByRoleId(Integer roleId) {
+		String opreation = Const.LOGGER_PREFIX_DEBUG + "THREADID = " + Thread.currentThread().getId() + ".|获取某个角色下的用户数量.|";
+		logger.debug(opreation + ".|开始");
+		
+		int count = userMapper.getCountByRoleId(roleId);
+		
+		logger.debug(opreation + ".|结束");
+		return count;
+	}
 }

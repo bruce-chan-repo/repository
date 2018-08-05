@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,11 +79,11 @@ public class StockSerivceImpl implements StockService {
 	}
 
 	@Override
-	public List<Stock> getStocks() {
+	public List<Stock> getStocks(Integer userId) {
 		String opreation = Const.LOGGER_PREFIX_DEBUG + "THREADID = " + Thread.currentThread().getId() + ".|获取所有的库存信息.|";
 		logger.debug(opreation + ".|开始");
 		
-		List<Stock> selectStocks = stockMapper.getStocks();
+		List<Stock> selectStocks = stockMapper.getStocks(userId);
 		
 		logger.debug(opreation + ".|结束");
 		return selectStocks;
@@ -122,9 +123,11 @@ public class StockSerivceImpl implements StockService {
 		// 获取已经存在的库存信息.
 		Map<String, Stock> existsStocks = getExistsStocks();
 		
+		// 获取已经存在的库存信息.
+		Map<String, Stock> existsStocksForParts = getExistsStocksForParts();
+		
 		// 最终添加的库存.
 		List<Stock> finalImportStocks = new ArrayList<>();
-		
 		
 		// 遍历所有对象
 		List<Stock> stocks = stocksPack.getStocks();
@@ -144,20 +147,49 @@ public class StockSerivceImpl implements StockService {
 				existsProducts.put(product.getProductCode(), product);
 			}
 			
-			// 判断当前导入的库存是否存在.
-			Stock stock = existsStocks.get(tempStock.getSequence());
-			if (stock == null) {
-				Stock addStock = new Stock();
-				
-				try {
-					BeanUtils.copyProperties(addStock, tempStock);
-				} catch (IllegalAccessException | InvocationTargetException e) {
-					e.printStackTrace();
+			String sequence = tempStock.getSequence();
+			if (StringUtils.isNotBlank(sequence) && !"-".equals(sequence)) {
+				// 判断当前导入的库存是否存在.
+				Stock stock = existsStocks.get(tempStock.getSequence());
+				if (stock == null) {
+					Stock addStock = new Stock();
+					
+					try {
+						BeanUtils.copyProperties(addStock, tempStock);
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
+					addStock.setProductId(product.getId());
+					addStock.setUserId(userId);
+					
+					finalImportStocks.add(addStock);
 				}
-				addStock.setProductId(product.getId());
-				addStock.setUserId(userId);
-				
-				finalImportStocks.add(addStock);
+			} else {
+				// 配件.
+				Stock stock = existsStocksForParts.get(tempStock.getProductCode());
+				if (stock == null) {
+					Stock addStock = new Stock();
+					
+					try {
+						BeanUtils.copyProperties(addStock, tempStock);
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
+					addStock.setProductId(product.getId());
+					addStock.setUserId(userId);
+					
+					finalImportStocks.add(addStock);
+				} else {
+					// 修改
+					Integer oldQuantity = stock.getQuantity();
+					Integer newQuantity = oldQuantity + tempStock.getQuantity();
+					
+					Stock updateStock = new Stock();
+					updateStock.setQuantity(newQuantity);
+					updateStock.setId(stock.getId());
+					
+					stockMapper.updateByPrimaryKeySelective(updateStock);
+				}
 			}
 		}
 		
@@ -196,12 +228,30 @@ public class StockSerivceImpl implements StockService {
 	private Map<String, Stock> getExistsStocks() {
 		Map<String, Stock> map = new HashMap<>();
 		
-		List<Stock> stocks = stockMapper.getStocks();
+		List<Stock> stocks = stockMapper.getStocks(null);
 		int size = stocks.size();
 		
 		for (int i = 0; i < size; i++) {
 			Stock stock = stocks.get(i);
 			map.put(stock.getSequence(), stock);
+		}
+		
+		return map;
+	}
+	
+	/**
+	 * 获取已经存在的库存信息.
+	 * @return
+	 */
+	private Map<String, Stock> getExistsStocksForParts() {
+		Map<String, Stock> map = new HashMap<>();
+		
+		List<Stock> stocks = stockMapper.getStocks(null);
+		int size = stocks.size();
+		
+		for (int i = 0; i < size; i++) {
+			Stock stock = stocks.get(i);
+			map.put(stock.getProduct().getProductCode(), stock);
 		}
 		
 		return map;
@@ -233,7 +283,13 @@ public class StockSerivceImpl implements StockService {
 		if ("".equals(productCode) || "-".equals(productCode)) {
 			stock = stockMapper.getStockCountByProductName(paramMap);
 		} else {
-			int stockNumber = stockMapper.getStockCountByProductCode(paramMap);
+			int stockNumber = 0;
+			List<Integer> quantitys = stockMapper.getStockCountByProductCode(paramMap);
+			if (quantitys != null && quantitys.size() > 1) {
+				stockNumber = quantitys.size();
+			} else if (quantitys != null && quantitys.size() == 1) {
+				stockNumber = quantitys.get(0);
+			}
 			
 			stock = new Stock();
 			stock.setQuantity(stockNumber);
@@ -249,6 +305,17 @@ public class StockSerivceImpl implements StockService {
 		logger.debug(opreation + ".|开始");
 		
 		int result = stockMapper.batchDelete(stockIds);
+		
+		logger.debug(opreation + ".|结束");
+		return result;
+	}
+
+	@Override
+	public int getProductStockCount(Integer productId) {
+		String opreation = Const.LOGGER_PREFIX_DEBUG + "THREADID = " + Thread.currentThread().getId() + ".|修改库存信息.|";
+		logger.debug(opreation + ".|开始");
+		
+		int result = stockMapper.getProductStockCount(productId);
 		
 		logger.debug(opreation + ".|结束");
 		return result;

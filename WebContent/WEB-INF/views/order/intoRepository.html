@@ -58,6 +58,7 @@
 		<button class="layui-btn layui-btn-primary btn-read">读取入库单</button>
 	    <button class="layui-btn btn-into">入库</button>
 	    <button class="layui-btn layui-btn-primary reset">重置</button>
+	    <a class="layui-btn layui-btn-primary" href="#getContext()/static/template/入库单.xlsx">下载导入模板</a>
 	  </div>
     </fieldset>
 	    <!-- <fieldset class="layui-elem-field">
@@ -85,15 +86,16 @@
 		  	  <div class="layui-form">
 				  <table class="layui-table" lay-filter="table" style="margin-bottom: 0px;margin-right: 8px;">
 				    <colgroup>
-				    	<col width="10%">
+				    	<col width="6%">
 						<col width="10%">
 						<col width="10%">
-						<col width="10%">
-						<col width="10%">
-						<col width="10%">
-						<col width="10%">
-						<col width="10%">
-						<col width="10%">
+						<col width="8%">
+						<col width="8%">
+						<col width="9%">
+						<col width="9%">
+						<col width="8%">
+						<col width="8%">
+						<col width="8%">
 						<col>
 				    </colgroup>
 				    <thead>
@@ -106,6 +108,7 @@
 				        <th>合同号</th>
 				        <th>提单号</th>
 				        <th>到货日期</th>
+				        <th>数量</th>
 				        <th>备注</th>
 				        <th>状态</th>
 				      </tr> 
@@ -171,17 +174,17 @@
 						var batchNumber = importStocks[i].batchNumber.replace(".", "");
 						 
 						var code = productCode + sequence + batchNumber;
-				  		 
 					  	var html = $("<tr class='" + code + "'>" + 
-					  					"<td width='10%'>" + (i + 1) + "</td>" +
+					  					"<td width='6%'>" + (i + 1) + "</td>" +
 								        "<td width='10%'><input type='hidden' name='productName' value='" + importStocks[i].productName + "'/>" + importStocks[i].productName + "</td>" +
 								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='productCode' value='" + importStocks[i].productCode + "' class='productCode'/></td>" +
-								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='sequence' value='" + importStocks[i].sequence + "'/></td>" +
-								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='batchNumber' value='" + importStocks[i].batchNumber + "'/></td>" +
-								        "<td width='10%'><input type='hidden' name='contractNumber' value='" + importStocks[i].contractNumber + "'/>" + importStocks[i].contractNumber + "</td>" +
-								        "<td width='10%'><input type='hidden' name='billNumber' value='" + importStocks[i].billNumber + "'/>" + importStocks[i].billNumber + "</td>" +
-								        "<td width='10%'><input type='hidden' name='importDate' value='" + importStocks[i].importDate + "'/><input type='hidden' name='arrivalDate' value='" + importStocks[i].arrivalDate + "'/>" + importStocks[i].arrivalDate + "</td>" +
-								        "<td width='10%' class='custom-td'><input type='text' class='table-input' name='remark' value='" + importStocks[i].remark + "'/></td>" +
+								        "<td width='8%' class='custom-td'><input type='text' class='table-input' name='sequence' value='" + importStocks[i].sequence + "'/></td>" +
+								        "<td width='8%' class='custom-td'><input type='text' class='table-input' name='batchNumber' value='" + importStocks[i].batchNumber + "'/></td>" +
+								        "<td width='9%'><input type='hidden' name='contractNumber' value='" + importStocks[i].contractNumber + "'/>" + importStocks[i].contractNumber + "</td>" +
+								        "<td width='9%'><input type='hidden' name='billNumber' value='" + importStocks[i].billNumber + "'/>" + importStocks[i].billNumber + "</td>" +
+								        "<td width='8%'><input type='hidden' name='importDate' value='" + importStocks[i].importDate + "'/><input type='hidden' name='arrivalDate' value='" + importStocks[i].arrivalDate + "'/>" + importStocks[i].arrivalDate + "</td>" +
+								        "<td width='8%' class='custom-td'><input type='text' class='table-input' name='quantity' value='" + importStocks[i].quantity + "'/></td>" +
+								        "<td width='8%' class='custom-td'><input type='text' class='table-input' name='remark' value='" + importStocks[i].remark + "'/></td>" +
 								        "<td class='status'></td>" +
 								    "</tr>");
 								    

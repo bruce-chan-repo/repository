@@ -28,7 +28,7 @@
 		}
 		#clue_con {
 			overflow:auto;
-			height: 220px;
+			height: 390px;
 			min-height: 0px;
 		}
 		.split {
@@ -56,128 +56,143 @@
 		.layui-field-box {
 			padding: 8px 15px;
 		}
+		.layui-tab-content{
+			height: 630px;
+		}
 	</style>
 </head>
 <body>
 	<form class="layui-form" action="#getContext()/order/mergeOrder.do" lay-filter="form">
-	<fieldset class="layui-elem-field">
-	  <legend>操作</legend>
-	  <div class="layui-field-box">
-	   <div class="layui-input-inline company-select">
-				<select name="userId" lay-verify="select" value="-1">
-					<option value="-1">请选择公司...</option>
-					#foreach($client in $!{clients})
-						<option value="$!{client.id}">$!{client.realName}</option>
-					#end
-				</select>
-		</div>
-		<span class="split"></span>
-		<button class="layui-btn layui-btn-primary btn-read">读取发货单</button>
-	    <button class="layui-btn btn-merge">合成发货单</button>
-	    <button class="layui-btn layui-btn-primary reset">重置</button>
-	  </div>
-    </fieldset>
-		<fieldset class="layui-elem-field">
-		  <legend>订单信息</legend>
-		  <div class="layui-field-box">
-				  <div class="layui-form-item">
-				    <div class="layui-inline order-base">
-				      <label class="layui-form-label">合同号</label>
-				      <div class="layui-input-inline">
-				        <input type="text" name="orderNo" autocomplete="off" class="layui-input">
-				      </div>
-				    </div>
-				    <div class="layui-inline order-base">
-				      <label class="layui-form-label">日期</label>
-				      <div class="layui-input-inline">
-				        <input type="text" name="createTime" autocomplete="off" class="layui-input">
-				      </div>
-				    </div>
-				    <div class="layui-inline order-base">
-				      <label class="layui-form-label">联系人</label>
-				      <div class="layui-input-inline">
-				        <input type="text" name="customName" autocomplete="off" class="layui-input">
-				      </div>
-				    </div>
-				    <div class="layui-inline order-base">
-				      <label class="layui-form-label">电话</label>
-				      <div class="layui-input-inline">
-				        <input type="text" name="customPhone" autocomplete="off" class="layui-input">
-				      </div>
-				    </div>
-				  </div>
-				  <div class="layui-form-item">
-				    <div class="layui-inline">
-				      <label class="layui-form-label">发货公司</label>
-				      <div class="layui-input-inline order-send">
-				        <input type="text" name="shipmentsCompany" lay-verify="date" autocomplete="off" class="layui-input">
-				      </div>
-				    </div>
-				    <div class="layui-inline">
-				      <label class="layui-form-label">发货地址</label>
-				      <div class="layui-input-inline order-send">
-				        <input type="text" name="shipmentsAddress" autocomplete="off" class="layui-input">
-				      </div>
-				    </div>
-				    <div class="layui-inline">
-					      <label class="layui-form-label">备注</label>
-					      <div class="layui-input-inline">
-					        <input type="text" name="remark" autocomplete="off" class="layui-input">
-					      </div>
-					</div>
-				  </div>
-				  <input type="hidden" value="" name="orderFile"/>
-				  <input type="hidden" value="" name="orderFileName">
-		  </div>
-		</fieldset>
-		<fieldset class="layui-elem-field">
-		  <legend>扫描区域</legend>
-		  <div class="layui-field-box">
-		  	 <textarea placeholder="扫描区域" class="layui-textarea scan-area"></textarea>
-		  </div>
-		</fieldset>
-		<fieldset class="layui-elem-field">
-		  <legend>订单明细</legend>
-		  <div class="layui-field-box" style="padding-top: 0px;">
-		  	  <div class="layui-form">
-				  <table class="layui-table" lay-filter="table" style="margin-bottom: 0px;">
-				  	<colgroup>
-						<col width="8%">
-						<col width="15%">
-						<col width="15%">
-						<col width="25%">
-						<col width="15%">
-						<col>
-					</colgroup>
-				    <thead>
-				      <tr>
-				        <th>序号</th>
-				        <th>型号</th>
-				        <th>产品代码</th>
-				        <th>序列号</th>
-				        <th>数量</th>
-				        <th>库存数量</th>
-				      </tr> 
-				    </thead>
-				</table>
-				<div class="layui-form-item" id="clue_con">
-					<table class="layui-table" style="margin-top:0px;">
-					<colgroup>
-						<col width="8%">
-						<col width="15%">
-						<col width="15%">
-						<col width="25%">
-						<col width="15%">
-						<col>
-					</colgroup>
-					<tbody id="clue_tbody">
-					
-					</tbody>
-					</table>
+    <div class="layui-tab layui-tab-card">
+	  <ul class="layui-tab-title">
+	    <li class="layui-this">基本信息</li>
+	    <li>订单明细</li>
+	  </ul>
+	  <div class="layui-tab-content">
+	    <div class="layui-tab-item layui-show">
+	    	<fieldset class="layui-elem-field">
+			  <legend>操作</legend>
+			  <div class="layui-field-box">
+			   <div class="layui-input-inline company-select">
+						<select name="userId" lay-verify="select" value="-1">
+							<option value="-1">请选择公司...</option>
+							#foreach($client in $!{clients})
+								<option value="$!{client.id}">$!{client.realName}</option>
+							#end
+						</select>
 				</div>
-			</div>
-		  </div>
-		</fieldset>
+				<span class="split"></span>
+				<button class="layui-btn layui-btn-primary btn-read">读取发货单</button>
+			    <button class="layui-btn btn-merge">合成发货单</button>
+			    <button class="layui-btn layui-btn-primary reset">重置</button>
+			  </div>
+		    </fieldset>
+			<fieldset class="layui-elem-field">
+			  <legend>订单信息</legend>
+			  <div class="layui-field-box">
+					  <div class="layui-form-item">
+					    <div class="layui-inline order-base">
+					      <label class="layui-form-label">合同号</label>
+					      <div class="layui-input-inline">
+					        <input type="text" name="orderNo" autocomplete="off" class="layui-input">
+					      </div>
+					    </div>
+					    <div class="layui-inline order-base">
+					      <label class="layui-form-label">日期</label>
+					      <div class="layui-input-inline">
+					        <input type="text" name="createTime" autocomplete="off" class="layui-input">
+					      </div>
+					    </div>
+					    <div class="layui-inline order-base">
+					      <label class="layui-form-label">联系人</label>
+					      <div class="layui-input-inline">
+					        <input type="text" name="customName" autocomplete="off" class="layui-input">
+					      </div>
+					    </div>
+					    <div class="layui-inline order-base">
+					      <label class="layui-form-label">电话</label>
+					      <div class="layui-input-inline">
+					        <input type="text" name="customPhone" autocomplete="off" class="layui-input">
+					      </div>
+					    </div>
+					  </div>
+					  <div class="layui-form-item">
+					    <div class="layui-inline">
+					      <label class="layui-form-label">发货公司</label>
+					      <div class="layui-input-inline order-send">
+					        <input type="text" name="shipmentsCompany" lay-verify="date" autocomplete="off" class="layui-input">
+					      </div>
+					    </div>
+					    <div class="layui-inline">
+					      <label class="layui-form-label">发货地址</label>
+					      <div class="layui-input-inline order-send">
+					        <input type="text" name="shipmentsAddress" autocomplete="off" class="layui-input">
+					      </div>
+					    </div>
+					    <div class="layui-inline">
+						      <label class="layui-form-label">备注</label>
+						      <div class="layui-input-inline">
+						        <input type="text" name="remark" autocomplete="off" class="layui-input">
+						      </div>
+						</div>
+					  </div>
+					  <input type="hidden" value="" name="orderFile"/>
+					  <input type="hidden" value="" name="orderFileName">
+			  </div>
+			</fieldset>
+		</div>
+	    <div class="layui-tab-item">
+	    	<fieldset class="layui-elem-field">
+			  <legend>扫描区域</legend>
+			  <div class="layui-field-box">
+			  	 <textarea placeholder="扫描区域" class="layui-textarea scan-area"></textarea>
+			  </div>
+			</fieldset>
+			<fieldset class="layui-elem-field">
+			  <legend>订单明细</legend>
+			  <div class="layui-field-box" style="padding-top: 0px;">
+			  	  <div class="layui-form">
+					  <table class="layui-table" lay-filter="table" style="margin-bottom: 0px;">
+					  	<colgroup>
+							<col width="8%">
+							<col width="15%">
+							<col width="15%">
+							<col width="25%">
+							<col width="15%">
+							<col>
+						</colgroup>
+					    <thead>
+					      <tr>
+					        <th>序号</th>
+					        <th>型号</th>
+					        <th>产品代码</th>
+					        <th>序列号</th>
+					        <th>数量</th>
+					        <th>库存数量</th>
+					      </tr> 
+					    </thead>
+					</table>
+					<div class="layui-form-item" id="clue_con">
+						<table class="layui-table" style="margin-top:0px;">
+						<colgroup>
+							<col width="8%">
+							<col width="15%">
+							<col width="15%">
+							<col width="25%">
+							<col width="15%">
+							<col>
+						</colgroup>
+						<tbody id="clue_tbody">
+						
+						</tbody>
+						</table>
+					</div>
+				</div>
+			  </div>
+			</fieldset>
+	    </div>
+	  </div>
+	</div>
 	</form>
 	
 	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
@@ -245,7 +260,7 @@
 								    "</tr>");
 						 
 				  		 // 没有产品编号的说明是附件.
-						 if (orderItems[i].productCode == "-" || orderItems[i].productCode == "" || orderItems[i].quantity > 1) {
+						 if (orderItems[i].productCode == "-" || orderItems[i].productCode == "" || orderItems[i].quantity > 1 || orderItems[i].productSequence == "-") {
 							 html.find(".sequece").remove();
 						 }		    
 								    

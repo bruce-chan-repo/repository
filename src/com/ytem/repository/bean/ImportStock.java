@@ -27,6 +27,8 @@ public class ImportStock {
     
     private String createTime;				// 入库日期.
     
+    private String quantity;				// 数量
+    
     
 
 	public String getProductName() {
@@ -107,5 +109,13 @@ public class ImportStock {
 
 	public void setArrivalDate(String arrivalDate) {
 		this.arrivalDate = arrivalDate;
+	}
+
+	public String getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(String quantity) {
+		this.quantity = quantity;
 	}
 }

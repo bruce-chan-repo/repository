@@ -28,7 +28,7 @@ import com.ytem.repository.service.MenuService;
 @Controller
 @RequestMapping("menu")
 public class MenuController {
-	private final Logger logger = Logger.getLogger(UserController.class);
+	private final Logger logger = Logger.getLogger(MenuController.class);
 	
 	@Autowired
 	private MenuService menuService;

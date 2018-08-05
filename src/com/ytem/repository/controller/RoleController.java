@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,6 +25,7 @@ import com.ytem.repository.common.PageInfoExt;
 import com.ytem.repository.common.ResponseCode;
 import com.ytem.repository.service.MenuService;
 import com.ytem.repository.service.RoleService;
+import com.ytem.repository.service.UserService;
 
 /**
  * 角色控制器
@@ -41,6 +43,9 @@ public class RoleController {
 	
 	@Autowired
 	private MenuService menuService;
+	
+	@Autowired
+	private UserService userService;
 	
 	
 	/**
@@ -159,6 +164,22 @@ public class RoleController {
 		JsonResult result;
 		
 		try {
+			if (StringUtils.isEmpty(roleIds)) {
+				result = new JsonResult(ResponseCode.ERROR.getCode(), "缺少参数");
+			}
+			
+			// 删除角色前， 查看该角色是否关联有用户
+			StringTokenizer tokenizer = new StringTokenizer(roleIds, ",");
+			while (tokenizer.hasMoreElements()) {
+				String roleId = (String) tokenizer.nextElement();
+				int count = userService.getCountByRoleId(Integer.parseInt(roleId));
+				
+				if (count > 0) {
+					result = new JsonResult(ResponseCode.ERROR.getCode(), "该角色还有用户关联，不能删除");
+					return result;
+				}
+			}
+			
 			// 执行修改操作.
 			int row = roleService.batchDelete(roleIds);
 			

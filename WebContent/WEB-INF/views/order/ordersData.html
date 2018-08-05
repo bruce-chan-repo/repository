@@ -5,8 +5,8 @@
 	<td>$!{order.user.realName}</td>
 	<td>$!{order.customName}</td>
 	<td>$!{order.customPhone}</td>
-	<td>$!{order.shipmentsCompany}</td>
-	<td>$!{order.shipmentsAddress}</td>
+	<td title="$!{order.shipmentsCompany}">#subString($!{order.shipmentsCompany}, 18)</td>
+	<td title="$!{order.shipmentsAddress}">#subString($!{order.shipmentsAddress}, 18)</td>
 	<td width="13%">$!{order.remark}</td>
 	<td>$!{order.createTime}</td>
 </tr>

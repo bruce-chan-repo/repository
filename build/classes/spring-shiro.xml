@@ -20,7 +20,7 @@
 	
 	<!-- 配置shiro sessionMananger -->
 	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-		<property name="globalSessionTimeout" value="1800000"></property>
+		<property name="globalSessionTimeout" value="3600000"></property>
 	</bean>
 	
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
