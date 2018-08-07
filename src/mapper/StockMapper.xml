@@ -281,6 +281,48 @@
   	</foreach>
   </insert>
   
+  <insert id="addStock" parameterType="Stock" keyProperty="id" useGeneratedKeys="true">
+  	INSERT
+  		INTO
+  	ytem_stock
+  	(
+  		product_id,
+  		user_id,
+  		sequence,
+		remark,
+		quantity,
+		batch_number,
+		contract_number,
+		bill_number,
+		import_date,
+		arrival_date,
+		create_time,
+		modified_time
+  	)
+  	VALUES
+	(
+		#{productId},
+		#{userId},
+		#{sequence},
+		#{remark},
+		#{quantity},
+		#{batchNumber},
+		#{contractNumber},
+		#{billNumber},
+		<choose>
+			<when test="importDate != null and importDate != ''">
+				#{importDate},
+			</when>
+			<otherwise>
+				#{arrivalDate},
+			</otherwise>
+		</choose>
+		#{arrivalDate},
+		NOW(),
+		NOW()
+	)
+  </insert>
+  
   <select id="selectNeedPurchase" resultType="Stock">
   	SELECT
 		b.product_name AS productName,

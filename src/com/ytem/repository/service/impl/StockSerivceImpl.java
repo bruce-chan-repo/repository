@@ -128,6 +128,7 @@ public class StockSerivceImpl implements StockService {
 		
 		// 最终添加的库存.
 		List<Stock> finalImportStocks = new ArrayList<>();
+		//List<Stock> finalUpdateStocks = new ArrayList<>();
 		
 		// 遍历所有对象
 		List<Stock> stocks = stocksPack.getStocks();
@@ -163,6 +164,10 @@ public class StockSerivceImpl implements StockService {
 					addStock.setUserId(userId);
 					
 					finalImportStocks.add(addStock);
+					//stockMapper.addStock(addStock);
+					
+					// 追加到已经存在的map中.
+					existsStocks.put(tempStock.getSequence(), addStock);
 				}
 			} else {
 				// 配件.
@@ -178,7 +183,11 @@ public class StockSerivceImpl implements StockService {
 					addStock.setProductId(product.getId());
 					addStock.setUserId(userId);
 					
-					finalImportStocks.add(addStock);
+					//finalImportStocks.add(addStock);
+					stockMapper.addStock(addStock);
+					
+					// 追加到已经存在的map中.
+					existsStocksForParts.put(tempStock.getProductCode(), addStock);
 				} else {
 					// 修改
 					Integer oldQuantity = stock.getQuantity();
@@ -192,11 +201,15 @@ public class StockSerivceImpl implements StockService {
 				}
 			}
 		}
-		
 		// finalImportStocks不为空时,批量插入.
 		if (CollectionUtils.isNotEmpty(finalImportStocks)) {
 			result = stockMapper.batchInsert(finalImportStocks);
 		}
+		
+		/*// 批量修改
+		for (int i = 0; i < finalUpdateStocks.size(); i++) {
+			stockMapper.updateByPrimaryKeySelective(finalUpdateStocks.get(i));
+		}*/
 		
 		logger.debug(opreation + ".|结束");
 		return result;

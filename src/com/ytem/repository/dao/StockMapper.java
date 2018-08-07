@@ -49,6 +49,13 @@ public interface StockMapper {
     int batchInsert(List<Stock> list);
     
     /**
+     * 添加库存信息.
+     * @param stock
+     * @return
+     */
+    int addStock(Stock stock);
+    
+    /**
      * 获取需要采购的产品
      * @return
      */
