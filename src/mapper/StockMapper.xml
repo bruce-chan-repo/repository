@@ -191,6 +191,7 @@
   		</if>
   		AND is_sold = 0
   	</where>
+  	ORDER BY y.create_time
   </select>
   
   <select id="selectByCondition" parameterType="Stock" resultMap="BaseResultMap">
@@ -383,6 +384,8 @@
 	WHERE
 		b.product_name = #{productName}
 		AND a.user_id = #{userId}
+		AND a.is_sold = 0
+	LIMIT 1;
   </select>
   
   <update id="updateQuantiyByCondition" parameterType="Stock">

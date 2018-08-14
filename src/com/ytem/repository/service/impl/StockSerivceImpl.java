@@ -197,6 +197,9 @@ public class StockSerivceImpl implements StockService {
 					updateStock.setQuantity(newQuantity);
 					updateStock.setId(stock.getId());
 					
+					// 实时更新内存中对象的库存信息.
+					stock.setQuantity(newQuantity);
+					
 					stockMapper.updateByPrimaryKeySelective(updateStock);
 				}
 			}

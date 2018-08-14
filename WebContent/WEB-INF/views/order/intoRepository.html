@@ -215,6 +215,11 @@
 					btn: ['确定','取消'] 
 				}, function(){
 					ajaxForm();
+					
+					layer.close(layer.index);
+					layer.load(1, {
+					  shade: [0.1,'#fff']
+					});
 				}, function(){
 					
 				});
@@ -253,6 +258,8 @@
 				dataType: "json",
 				data: {"stockPackJson": requestData},
 				success: function( result ) {
+					layer.close(layer.index);
+					
 					layer.msg( result.msg );
 					$(".reset").trigger("click");
 				},
@@ -260,7 +267,6 @@
 					layer.msg( result.msg );
 				}
 			 });
-			
 			 /* $("form").ajaxSubmit({
 				url: "#getContext()/order/intoRepository.do",
 				type: "post",
