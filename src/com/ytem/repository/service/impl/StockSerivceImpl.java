@@ -151,7 +151,7 @@ public class StockSerivceImpl implements StockService {
 			String sequence = tempStock.getSequence();
 			if (StringUtils.isNotBlank(sequence) && !"-".equals(sequence)) {
 				// 判断当前导入的库存是否存在.
-				Stock stock = existsStocks.get(tempStock.getSequence());
+				Stock stock = existsStocks.get(tempStock.getProductCode() + tempStock.getSequence());
 				if (stock == null) {
 					Stock addStock = new Stock();
 					
@@ -167,7 +167,7 @@ public class StockSerivceImpl implements StockService {
 					//stockMapper.addStock(addStock);
 					
 					// 追加到已经存在的map中.
-					existsStocks.put(tempStock.getSequence(), addStock);
+					existsStocks.put(tempStock.getProductCode() + tempStock.getSequence(), addStock);
 				}
 			} else {
 				// 配件.
@@ -249,7 +249,7 @@ public class StockSerivceImpl implements StockService {
 		
 		for (int i = 0; i < size; i++) {
 			Stock stock = stocks.get(i);
-			map.put(stock.getSequence(), stock);
+			map.put(stock.getProductCode() + stock.getSequence(), stock);
 		}
 		
 		return map;
