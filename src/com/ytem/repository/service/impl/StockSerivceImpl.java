@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
+import com.ytem.repository.bean.ImportStock;
 import com.ytem.repository.bean.ImportStocksPack;
 import com.ytem.repository.bean.Product;
 import com.ytem.repository.bean.Stock;
@@ -335,5 +336,16 @@ public class StockSerivceImpl implements StockService {
 		
 		logger.debug(opreation + ".|结束");
 		return result;
+	}
+
+	@Override
+	public List<ImportStock> getStatisticsStocks(Integer userId) {
+		String opreation = Const.LOGGER_PREFIX_DEBUG + "THREADID = " + Thread.currentThread().getId() + ".|获取库存统计信息.|";
+		logger.debug(opreation + ".|开始");
+		
+		List<ImportStock> statisticsStocks = stockMapper.getStatisticsStocks(userId);
+		
+		logger.debug(opreation + ".|结束");
+		return statisticsStocks;
 	}
 }

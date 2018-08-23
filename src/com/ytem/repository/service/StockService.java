@@ -2,6 +2,7 @@ package com.ytem.repository.service;
 
 import java.util.List;
 
+import com.ytem.repository.bean.ImportStock;
 import com.ytem.repository.bean.ImportStocksPack;
 import com.ytem.repository.bean.Stock;
 import com.ytem.repository.common.PageInfoExt;
@@ -89,4 +90,12 @@ public interface StockService {
      * @return
      */
     int getProductStockCount(Integer productId);
+    
+    /**
+     * 获取库存统计信息.
+     * @param userId
+     * @return
+     */
+    List<ImportStock> getStatisticsStocks(Integer userId);
+ 
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.ytem.repository.bean.ImportStock;
 import com.ytem.repository.bean.Order;
 import com.ytem.repository.bean.Stock;
 
@@ -115,4 +116,11 @@ public interface StockMapper {
      * @return
      */
     int getProductStockCount(Integer productId);
+    
+    /**
+     * 获取统计库存信息.
+     * @param userId
+     * @return
+     */
+    List<ImportStock> getStatisticsStocks(Integer userId);
 }

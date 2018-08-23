@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ytem.repository.bean.ImportStock;
 import com.ytem.repository.bean.Product;
 import com.ytem.repository.bean.Stock;
 import com.ytem.repository.bean.User;
@@ -438,14 +439,17 @@ public class StockController {
             String fileName = URLEncoder.encode("库存信息.xls", "UTF-8");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName);
             
-            // 获取数据
+            // 获取导出数据
             List<Stock> stocks = stockService.getStocks(userId);
+            
+            // 获取统计数据
+            List<ImportStock>  statisticsStocks = stockService.getStatisticsStocks(userId);
             
             // 创建工作簿
             HSSFWorkbook wb = new HSSFWorkbook();
             
             // 向excel中构建数据.
-            buildExcel(wb, stocks);
+            buildExcel(wb, stocks, statisticsStocks);
             
             wb.write(sos);
             sos.flush();
@@ -460,7 +464,7 @@ public class StockController {
 	 * 构建导出的excel
 	 * @param workbook
 	 */
-	private void buildExcel(HSSFWorkbook workbook, List<Stock> stocks) {
+	private void buildExcel(HSSFWorkbook workbook, List<Stock> stocks, List<ImportStock>  statisticsStocks) {
 		// 创建sheet
 		HSSFSheet sheet = workbook.createSheet("商品库存.");
 		
@@ -487,6 +491,35 @@ public class StockController {
 						Date date = DateTimeUtil.string2Date(value);
 						value = DateTimeUtil.date2String(date, "yyyy-MM-dd HH:mm:dd");
 					}
+				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+					e.printStackTrace();
+				}
+				
+				HSSFCell cell = tempRow.createCell(j);
+				cell.setCellValue(value);
+				cell.setCellStyle(valueStyle);
+			}
+		}
+		
+		// 生成统计信息
+		int lastRowNum = sheet.getLastRowNum();
+		int statisticsNum = lastRowNum + 3;
+		
+		coloums = new String[]{"型号,productName", "产品代码,productCode", "库存数量,quantity"};
+		
+		row = sheet.createRow(statisticsNum++);
+		ExportUtil.buildColumnHeader(workbook, row, coloums);
+		
+		size = statisticsStocks == null ? 0 : statisticsStocks.size();
+		for (int i = 0; i < size; i++) {
+			HSSFRow tempRow = sheet.createRow(i + statisticsNum);
+			ImportStock importStock = statisticsStocks.get(i);
+			
+			for (int j = 0; j < coloums.length; j++) {
+				String property = coloums[j].split(",")[1];
+				String value = "";
+				try {
+					value = BeanUtils.getProperty(importStock, property);
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 					e.printStackTrace();
 				}

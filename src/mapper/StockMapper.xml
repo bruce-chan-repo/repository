@@ -238,6 +238,22 @@
   	</where>
   </select>
   
+  <select id="getStatisticsStocks" parameterType="int" resultType="ImportStock">
+  	SELECT
+		b.product_name productName,
+		b.product_code productCode,
+		SUM(a.quantity) quantity
+	FROM
+		ytem_stock a
+	INNER JOIN ytem_product b ON a.product_id = b.id
+	WHERE	
+		a.is_sold = 0
+	AND 
+		a.user_id = #{userId}
+	GROUP BY
+		a.product_id
+  </select>
+  
   <insert id="batchInsert" parameterType="list">
   	INSERT
   		INTO
