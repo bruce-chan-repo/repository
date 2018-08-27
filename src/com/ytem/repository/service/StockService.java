@@ -2,7 +2,7 @@ package com.ytem.repository.service;
 
 import java.util.List;
 
-import com.ytem.repository.bean.ImportStock;
+import com.github.pagehelper.PageInfo;
 import com.ytem.repository.bean.ImportStocksPack;
 import com.ytem.repository.bean.Stock;
 import com.ytem.repository.common.PageInfoExt;
@@ -96,6 +96,14 @@ public interface StockService {
      * @param userId
      * @return
      */
-    List<ImportStock> getStatisticsStocks(Integer userId);
- 
+    List<Stock> getStatisticsStocks(Integer userId);
+    
+    /**
+     * 根据分页获取库存统计信息
+     * @param condition
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    PageInfo<Stock> getStatisticsByPage(Stock condition, Integer pageNo, Integer pageSize);
 }

@@ -1,12 +1,14 @@
 package com.ytem.repository.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import com.ytem.repository.dao.OrderItemMapper;
 import com.ytem.repository.dao.OrderMapper;
 import com.ytem.repository.dao.StockMapper;
 import com.ytem.repository.service.OrderService;
+import com.ytem.repository.utils.DateTimeUtil;
 
 /**
  * 订单的业务实现
@@ -49,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
 		logger.debug(opreation + ".|开始");
 		
 		// step 1: 保存订单信息.
+		order.setCreateTime(DateTimeUtil.date2String(new Date()));
 		int result = orderMapper.insertSelective(order);
 		
 		// step 2: 保存订单明细信息

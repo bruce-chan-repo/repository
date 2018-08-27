@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
-import com.ytem.repository.bean.ImportStock;
+import com.github.pagehelper.PageInfo;
 import com.ytem.repository.bean.ImportStocksPack;
 import com.ytem.repository.bean.Product;
 import com.ytem.repository.bean.Stock;
@@ -339,13 +339,30 @@ public class StockSerivceImpl implements StockService {
 	}
 
 	@Override
-	public List<ImportStock> getStatisticsStocks(Integer userId) {
+	public List<Stock> getStatisticsStocks(Integer userId) {
 		String opreation = Const.LOGGER_PREFIX_DEBUG + "THREADID = " + Thread.currentThread().getId() + ".|获取库存统计信息.|";
 		logger.debug(opreation + ".|开始");
 		
-		List<ImportStock> statisticsStocks = stockMapper.getStatisticsStocks(userId);
+		Stock condition = new Stock();
+		condition.setUserId(userId);
+		
+		List<Stock> statisticsStocks = stockMapper.getStatisticsStocks(condition);
 		
 		logger.debug(opreation + ".|结束");
 		return statisticsStocks;
+	}
+	
+	@Override
+	public PageInfo<Stock> getStatisticsByPage(Stock condition, Integer pageNo, Integer pageSize) {
+		String opreation = Const.LOGGER_PREFIX_DEBUG + "THREADID = " + Thread.currentThread().getId() + ".|根据分页获取库存统计信息.|";
+		logger.debug(opreation + ".|开始");
+		
+		PageHelper.startPage(pageNo, pageSize);
+		
+		List<Stock> stocks = stockMapper.getStatisticsStocks(condition);
+		PageInfo<Stock> pageInfo = new PageInfo<>(stocks);
+		
+		logger.debug(opreation + ".|结束");
+		return pageInfo;
 	}
 }

@@ -1,0 +1,35 @@
+#foreach($stock in $!{pageInfo.list})
+<tr>
+	<td width="25%">$!{stock.productName}</td>
+	<td width="25%">$!{stock.productCode}</td>
+	<td width="25%">$!{stock.realName}</td>
+	<td width="25%">$!{stock.quantity}</td>
+</tr>
+#end
+
+<script type="text/javascript">
+	// 保证分页插件只加载一次.
+	if (i == 1) {
+		layui.use('laypage', function(){
+		   var laypage = layui.laypage;
+		   
+		   //完整功能
+		   laypage.render({
+			 elem: 'pageHelper',
+			 count: '$!{pageInfo.total}',
+			 limit: '$!{pageInfo.pageSize}',
+			 layout: ['count', 'prev', 'page', 'next', 'refresh', 'skip'],
+		     jump: function(obj, first){
+		    	 if (!first) {
+		    		 $("#currPage").val(obj.curr);
+			    	 toLoad(obj.curr);
+		    	 }
+		    	 
+		    	 return false;
+		     }
+		   });
+		});
+	}
+	
+	form.render('checkbox');
+</script>

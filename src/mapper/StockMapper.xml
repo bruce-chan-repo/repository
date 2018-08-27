@@ -238,18 +238,29 @@
   	</where>
   </select>
   
-  <select id="getStatisticsStocks" parameterType="int" resultType="ImportStock">
+  <select id="getStatisticsStocks" parameterType="Stock" resultType="Stock">
   	SELECT
 		b.product_name productName,
 		b.product_code productCode,
+		c.real_name realName,
 		SUM(a.quantity) quantity
 	FROM
 		ytem_stock a
-	INNER JOIN ytem_product b ON a.product_id = b.id
+	JOIN ytem_product b ON a.product_id = b.id
+	JOIN ytem_sys_user c ON a.user_id = c.id
 	WHERE	
 		a.is_sold = 0
-	AND 
-		a.user_id = #{userId}
+	<if test="userId != null and userId != -1">
+		AND a.user_id = #{userId}
+	</if>
+	<if test="productName != null and productName != ''">
+		AND 
+		(
+			b.product_name LIKE CONCAT('%', #{productName}, '%')
+			OR
+			b.product_code LIKE CONCAT('%', #{productName}, '%')
+		)
+	</if>
 	GROUP BY
 		a.product_id
   </select>

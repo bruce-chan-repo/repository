@@ -122,5 +122,5 @@ public interface StockMapper {
      * @param userId
      * @return
      */
-    List<ImportStock> getStatisticsStocks(Integer userId);
+    List<Stock> getStatisticsStocks(Stock stock);
 }

@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.ytem.repository.bean.ImportStock;
+import com.github.pagehelper.PageInfo;
 import com.ytem.repository.bean.Product;
 import com.ytem.repository.bean.Stock;
 import com.ytem.repository.bean.User;
@@ -406,6 +406,61 @@ public class StockController {
 	}
 	
 	/**
+	 * 跳转到库存统计页面.
+	 * @return
+	 */
+	@RequestMapping("toStataistics.do")
+	public ModelAndView toStatistics(HttpServletRequest request) {
+		ModelAndView mv = new ModelAndView("/stock/statistics");
+		
+		// 查询所有的客户.
+		List<User> clients = userService.getAllClients();
+		
+		// 获取当前登录的用户.
+		Subject subject = SecurityUtils.getSubject();
+		String username = subject.getPrincipal().toString();
+		
+		// 获取用户信息
+		User currUser = (User) request.getSession().getAttribute(username);
+		
+		mv.addObject("clients", clients);
+		mv.addObject("currUser", currUser);
+		
+		return mv;
+	}
+	
+	/**
+	 * 获取库存统计信息.
+	 * @param condition
+	 * @param pageNum
+	 * @param pageSize
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("statistics.do")
+	public ModelAndView statistics(Stock condition, @RequestParam(value = "curpage", defaultValue = "1") Integer pageNum, 
+			@RequestParam(value = "limit", defaultValue = "10") Integer pageSize, HttpServletRequest request) {
+		ModelAndView mv = new ModelAndView("/stock/statisticsData");
+		
+		// 获取当前登录的用户.
+		Subject subject = SecurityUtils.getSubject();
+		String username = subject.getPrincipal().toString();
+		
+		// 获取用户信息
+		User currUser = (User) request.getSession().getAttribute(username);
+		
+		// 如果是客户登录的话，需要查询自己的订单列表.
+		if (currUser.getRole().getId() != 1) {
+			condition.setUserId(currUser.getId());
+		}
+		
+		PageInfo<Stock> pageInfo = stockService.getStatisticsByPage(condition, pageNum, pageSize);
+		
+		mv.addObject("pageInfo", pageInfo);
+		return mv;
+	}
+	
+	/**
 	 * 跳转到导出页面.
 	 * @return
 	 */
@@ -443,7 +498,7 @@ public class StockController {
             List<Stock> stocks = stockService.getStocks(userId);
             
             // 获取统计数据
-            List<ImportStock>  statisticsStocks = stockService.getStatisticsStocks(userId);
+            List<Stock> statisticsStocks = stockService.getStatisticsStocks(userId);
             
             // 创建工作簿
             HSSFWorkbook wb = new HSSFWorkbook();
@@ -464,7 +519,7 @@ public class StockController {
 	 * 构建导出的excel
 	 * @param workbook
 	 */
-	private void buildExcel(HSSFWorkbook workbook, List<Stock> stocks, List<ImportStock>  statisticsStocks) {
+	private void buildExcel(HSSFWorkbook workbook, List<Stock> stocks, List<Stock> statisticsStocks) {
 		// 创建sheet
 		HSSFSheet sheet = workbook.createSheet("商品库存.");
 		
@@ -513,13 +568,13 @@ public class StockController {
 		size = statisticsStocks == null ? 0 : statisticsStocks.size();
 		for (int i = 0; i < size; i++) {
 			HSSFRow tempRow = sheet.createRow(i + statisticsNum);
-			ImportStock importStock = statisticsStocks.get(i);
+			Stock tempStock = statisticsStocks.get(i);
 			
 			for (int j = 0; j < coloums.length; j++) {
 				String property = coloums[j].split(",")[1];
 				String value = "";
 				try {
-					value = BeanUtils.getProperty(importStock, property);
+					value = BeanUtils.getProperty(tempStock, property);
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 					e.printStackTrace();
 				}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>库存统计列表</title>
+	<link rel="stylesheet" href="#getContext()/static/layui/css/layui.css">
+	<style type="text/css">
+		.btn-group{
+			margin-right: 5px;
+		}
+		.layui-split input{
+			width: 250px;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" >
+		<div class="btn-group">
+		  <!-- <button class="layui-btn layui-btn-sm layui-btn-primary stock-import" data-type="isAll">导入库存信息</button> -->
+		  <div class="layui-inline layui-split">
+		    <input type="text" name="productName" placeholder="请输入型号名称或产品代码" autocomplete="off" class="layui-input" lay-verify=""/>
+		  </div>
+		  #if ($!{currUser.role.id} == 1) 
+		 	<div class="layui-input-inline">
+				<select name="userId" lay-verify="select" value="-1">
+					<option value="-1">请选择客户...</option>
+					#foreach($client in $!{clients})
+						<option value="$!{client.id}">$!{client.realName}</option>
+					#end
+				</select>
+			</div>	  
+		  #end
+		  <button class="layui-btn seach" data-type="reload">搜索</button>
+		</div>
+	</form>
+	
+	<div class="layui-form">
+		<table class="layui-table" lay-filter="parse-table">
+			<thead>
+				<tr>
+					<th>产品名称</th>
+					<th>产品代码</th>
+					<th>客户名称</th>
+					<th>库存数量</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+	</div>
+	<div id="pageHelper"></div>
+	<input type="hidden" id="currPage" value="1"/>
+
+	<script type="text/javascript" src="#getContext()/static/js/jquery-1.8.3.js"></script>
+	<script src="#getContext()/static/layui/layui.all.js" charset="utf-8"></script>
+	<script type="text/javascript" src="#getContext()/static/js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			// 全选.
+			$(document).on("click", "#checkAll + div", function() {
+				var isChecked = $("#checkAll").is(":checked");
+				
+				$("tbody").find(":checkbox").prop("checked", isChecked);
+				
+				form.render('checkbox');
+			});
+			
+			// 筛选按钮点击事件
+			$(".seach").bind("click", function(){
+				i = 0;						// 修改此参数可重新刷新分页
+				$("#currPage").val("1");	// 修改分页值为第一页 
+				toLoad();
+				return false;
+			});
+			
+			toLoad();
+		});
+		
+		layui.use("form", function() {
+			form = layui.form;
+		});
+		
+		var i = 0;
+		// 加载分页信息.
+		function toLoad() {
+			var currPage = $("#currPage").val();
+			
+			var data = $("form").serializeObject();
+			data['curpage'] = currPage;
+			
+			$("tbody").empty();
+			
+			$("tbody").load("#getContext()/stock/statistics.do", data);
+			
+			i++;
+		}
+	</script>
+</body>
+</html>

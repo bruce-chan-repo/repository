@@ -60,6 +60,16 @@ public class DateTimeUtil {
 	}
 	
 	/**
+	 * 时间转换字符串
+	 * @param date
+	 * @param pattern
+	 */
+	public static String date2String(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat(STANDARD_PATTERN);
+		return sdf.format(date);
+	}
+	
+	/**
 	 * 字符串转时间
 	 * @param date
 	 * @param pattern

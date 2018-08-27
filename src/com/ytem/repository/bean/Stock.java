@@ -44,9 +44,11 @@ public class Stock {
     /*  辅助属性  */
     private String productName;		// 产品名称.
     
-    private String productCode;		// 产品代码
+    private String productCode;		// 产品代码.
     
     private Integer rest;			// 剩余库存数量.
+    
+    private String realName;		// 用户名称.
     
 
     public Stock(Integer id, Integer productId, String sequence, Byte status, String remark, Boolean isSold, String createTime, String modifiedTime) {
@@ -260,5 +262,13 @@ public class Stock {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(String realName) {
+		this.realName = realName;
 	}
 }
