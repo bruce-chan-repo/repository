@@ -12,10 +12,11 @@
 </head>
 <body>
 	<form class="layui-form" action="#getContext()/stock/export.do">
+		#if (!$!{currUser.role.roleName.contains("客户")})
 		<div class="layui-form-item">
     		<label class="layui-form-label">选择客户: </label>
 			<div class="layui-input-inline">
-				<select name="userId" lay-verify="select" value="-1">
+				<select name="select" lay-verify="select" value="-1" lay-filter="client">
 					<option value="-1">请选择客户...</option>
 					#foreach($client in $!{clients})
 						<option value="$!{client.id}">$!{client.realName}</option>
@@ -23,6 +24,8 @@
 				</select>
 			</div>
 		</div>
+		#end
+		<input type="hidden" name="userId"/>
 		<div class="layui-form-item">
 			<label class="layui-form-label"></label>
 			<div class="layui-input-inline">
@@ -36,15 +39,29 @@
 	<script type="text/javascript">
 		layui.use("form", function() {
 			form = layui.form;
+			
+			/* form.on('select(client)', function(data){
+			  console.log(data.elem);  // 得到select原始DOM对象
+			  console.log(data.value); // 得到被选中的值
+			  console.log(data.othis); // 得到美化后的DOM对象
+			}); */     
 		});
 		
 		$(function(){
 			$(".layui-btn").bind("click", function(){
-				var value = $("select[name='userId']").val();
+				debugger;
+				var value = $("select[name='select']").val();
 				
 				if (value == "-1") {
 					layer.msg("请选择需要导出库存的公司");
 					return false;
+				}
+				
+				var isClient = "$!{currUser.role.roleName.contains('客户')}";
+				if ( isClient && isClient == "true" ) {
+					$("input[name='userId']").val("$!{currUser.id}");
+				} else {
+					$("input[name='userId']").val(value);
 				}
 				
 				$("form").submit();

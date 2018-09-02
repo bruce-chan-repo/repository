@@ -33,7 +33,7 @@
 				<option value="2">破损</option>
 			</select>
 		  </div>
-		  #if ($!{currUser.role.id} == 1) 
+		  #if (!$!{currUser.role.roleName.contains("客户")}) 
 		 	<div class="layui-input-inline">
 				<select name="userId" lay-verify="select" value="-1">
 					<option value="-1">请选择客户...</option>

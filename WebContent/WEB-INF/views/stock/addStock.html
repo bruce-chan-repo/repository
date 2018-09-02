@@ -35,8 +35,8 @@
 				</select>
 			</div>
 		</div>
-		## admin
-		#if($!{currUser.role.id} == 1)
+		## admin || 管理员
+		#if (!$!{currUser.role.roleName.contains("客户")})
 			<div class="layui-form-item">
 				<label class="layui-form-label">所属客户</label>
 				<div class="layui-input-inline">

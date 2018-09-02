@@ -29,4 +29,6 @@ public class Const {
 	public static final String UPLOAD_FILE_PATH = PropertiesUtil.getProperty("upload_file_path");
 	
 	public static final String SUFFIX_TMPFILE_SAVEPATH = PropertiesUtil.getProperty("suffix_tmpfile_savepath");
+	
+	public static final String MANAGERS = PropertiesUtil.getProperty("managers", "1");
 }

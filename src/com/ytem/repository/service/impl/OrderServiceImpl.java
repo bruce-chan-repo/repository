@@ -8,7 +8,6 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,6 @@ import com.ytem.repository.utils.DateTimeUtil;
  * @date 2018年5月17日上午9:22:09
  * @description
  */
-
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
 	private final Logger logger = Logger.getLogger(ProductServiceImpl.class);

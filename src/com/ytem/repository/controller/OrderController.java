@@ -129,7 +129,7 @@ public class OrderController {
 		User currUser = (User) request.getSession().getAttribute(username);
 		
 		// 如果是客户登录的话，需要查询自己的订单列表.
-		if (currUser.getRole().getId() != 1) {
+		if (currUser.getRole().getRoleName().contains("客户")) {
 			condition.setUserId(currUser.getId());
 		}
 		

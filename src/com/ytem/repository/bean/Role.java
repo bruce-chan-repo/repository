@@ -95,4 +95,10 @@ public class Role {
 	public void setMenuList(List<Menu> menuList) {
 		this.menuList = menuList;
 	}
+
+	@Override
+	public String toString() {
+		return "Role [id=" + id + ", roleName=" + roleName + ", description=" + description + ", available=" + available
+				+ ", createTime=" + createTime + ", modifiedTime=" + modifiedTime + ", menuList=" + menuList + "]";
+	}
 }

@@ -103,7 +103,7 @@ public class StockController {
 		User currUser = (User) request.getSession().getAttribute(username);
 		
 		// 如果是客户登录的话，需要查询自己的订单列表.
-		if (currUser.getRole().getId() != 1) {
+		if (currUser.getRole().getRoleName().contains("客户")) {
 			condition.setUserId(currUser.getId());
 		}
 		
@@ -159,7 +159,7 @@ public class StockController {
 			User currUser = (User) request.getSession().getAttribute(username);
 			
 			// 如果是客户登录的话，需要查询自己的订单列表.
-			if (currUser.getRole().getId() != 1) {
+			if (currUser.getRole().getRoleName().contains("客户")) {
 				stock.setUserId(currUser.getId());
 			}
 			
@@ -450,7 +450,7 @@ public class StockController {
 		User currUser = (User) request.getSession().getAttribute(username);
 		
 		// 如果是客户登录的话，需要查询自己的订单列表.
-		if (currUser.getRole().getId() != 1) {
+		if (currUser.getRole().getRoleName().contains("客户")) {
 			condition.setUserId(currUser.getId());
 		}
 		
@@ -465,12 +465,20 @@ public class StockController {
 	 * @return
 	 */
 	@RequestMapping("toExport.do")
-	public ModelAndView toExport() {
+	public ModelAndView toExport(HttpServletRequest request) {
 		ModelAndView mv = new ModelAndView("/stock/exportStock");
 		
 		// 查询所有的客户.
 		List<User> clients = userService.getAllClients();
 		
+		// 获取当前登录的用户.
+		Subject subject = SecurityUtils.getSubject();
+		String username = subject.getPrincipal().toString();
+		
+		// 获取用户信息
+		User currUser = (User) request.getSession().getAttribute(username);
+		
+		mv.addObject("currUser", currUser);
 		mv.addObject("clients", clients);
 		return mv;
 	}
