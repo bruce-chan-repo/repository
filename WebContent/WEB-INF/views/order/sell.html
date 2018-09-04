@@ -137,6 +137,20 @@
 							      </div>
 							</div>
 						  </div>
+						  <div class="layui-form-item">
+						  	<div class="layui-inline">
+							      <label class="layui-form-label">说明</label>
+							      <div class="layui-input-inline order-send">
+							        <input type="text" name="desc" autocomplete="off" class="layui-input">
+							      </div>
+							</div>
+							<div class="layui-inline">
+							      <label class="layui-form-label">标注</label>
+							      <div class="layui-input-inline order-send">
+							        <input type="text" name="mark" autocomplete="off" class="layui-input">
+							      </div>
+							</div>
+						  </div>
 						  <input type="hidden" value="" name="orderFile"/>
 						  <input type="hidden" value="" name="orderFileName">
 				  </div>
@@ -242,6 +256,8 @@
 				  	 $("input[name='customPhone']").val(data.customPhone);
 				  	 $("input[name='shipmentsCompany']").val(data.shipmentsCompany);
 				  	 $("input[name='shipmentsAddress']").val(data.shipmentsAddress);
+				  	 $("input[name='desc']").val(data.desc);
+				  	 $("input[name='mark']").val(data.mark);
 				  	 
 				  	 var orderItems = data.orderItems;
 				  	 for (var i = 0; i < orderItems.length; i++) {

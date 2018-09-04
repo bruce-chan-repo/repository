@@ -374,6 +374,14 @@ public class ImportHanler {
 		resolverOrder.setOrderNo(orderNo);
 		resolverOrder.setCreateTime(date);
 		
+		// 订单标注信息
+		Row lastRow = sheet.getRow(lastRowNum - 1);
+		String desc = getCellValueByCell(lastRow.getCell(0));
+		String mark = getCellValueByCell(lastRow.getCell(8));
+		
+		resolverOrder.setDesc(desc);
+		resolverOrder.setMark(mark);
+		
 		if (customInfos != null && customInfos.length == 1) {
 			resolverOrder.setCustomName(customInfos[0]);
 		} else if (customInfos != null && customInfos.length == 2) {

@@ -34,6 +34,9 @@ public class Order {
     
     private Integer tableNumber;		// 分表编号
     
+    private String desc;				// 说明
+    
+    private String mark;				// 标注
     
 
     public Order(Integer id, String orderNo, Integer userId, String customName, String customPhone, String shipmentsCompany, String shipmentsAddress, String remark, String createTime, String modifiedTime) {
@@ -171,5 +174,21 @@ public class Order {
 
 	public void setOrderFileName(String orderFileName) {
 		this.orderFileName = orderFileName;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+
+	public String getMark() {
+		return mark;
+	}
+
+	public void setMark(String mark) {
+		this.mark = mark;
 	}
 }
