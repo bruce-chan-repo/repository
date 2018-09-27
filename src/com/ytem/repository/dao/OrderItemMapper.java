@@ -2,6 +2,8 @@ package com.ytem.repository.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.ytem.repository.bean.Order;
 import com.ytem.repository.bean.OrderItem;
 
@@ -31,4 +33,11 @@ public interface OrderItemMapper {
      * @return
      */
     List<OrderItem> selectOrderItems(OrderItem item);
+    
+    /**
+     * 批量删除订单明细
+     * @param orderId
+     * @return
+     */
+    int batchDeleteByOrderId(@Param("orderId") Integer orderId, @Param("tableNum") Integer tableNum);
 }

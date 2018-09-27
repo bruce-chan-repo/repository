@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -87,6 +88,37 @@ public class OrderController {
 		mv.addObject("method", method);
 		mv.addObject("userId", userId);
 		return mv;
+	}
+	
+	/**
+	 * 删除订单信息.
+	 * @param orderIds
+	 * @return
+	 */
+	@RequestMapping("deleteOrders.do")
+	@ResponseBody
+	public JsonResult deleteOrders(String orderIds) {
+		JsonResult result = null;
+		
+		try {
+			// 校验接口参数.
+			if (StringUtils.isBlank(orderIds)) {
+				result = new JsonResult(ResponseCode.ERROR.getCode(), "缺少参数");
+				return result;
+			}
+			
+			int row = orderService.batchDelete(orderIds);
+			if (row > 0) {
+				result = new JsonResult<>(ResponseCode.SUCCESS.getCode(), "删除订单成功");
+			} else {
+				result = new JsonResult<>(ResponseCode.ERROR.getCode(), "删除订单错误");
+			}
+		} catch (Exception e) {
+			logger.error("异常信息-删除订单信息", e);
+			result = new JsonResult<>(ResponseCode.ERROR.getCode(), "删除订单错误");
+		}
+		
+		return result;
 	}
 	
 	/**

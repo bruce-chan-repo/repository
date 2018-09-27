@@ -39,17 +39,14 @@
 		  #end
 				  
 		  <button class="layui-btn seach" data-type="reload">搜索</button>
+		  <button class="layui-btn layui-btn-sm layui-btn-primary order-delete" data-type="isAll">删除</button>
 		</div>
 	</form>
 	<div class="layui-form">
 		<table class="layui-table">
 			<colgroup>
-				<col width="150">
-				<col width="200">
-				<col>
-			</colgroup>
-			<thead>
 				<tr>
+					<th><input type="checkbox" lay-skin="primary" id="checkAll"></th>
 					<th>编号</th>
 					<th>合同号</th>
 					<th>订单所属客户</th>
@@ -106,6 +103,73 @@
 				$("#currPage").val("1");	// 修改分页值为第一页 
 				toLoad();
 				return false;
+			});
+			
+			// 删除订单信息
+			$(".order-delete").bind("click", function() {
+				var ids = "";
+				$("tbody").find(":checked").each(function( index ) {
+					ids += "," + $(this).val();
+				});
+				
+				if (ids == "") {
+					layer.alert("请选择需要删除的订单");					
+					return false;
+				}
+				
+				layer.confirm("确定删除订单吗？", {
+				  btn: ["确定", "取消"]
+				}, function(){
+					layer.prompt({title: '请输入您的密码', formType: 1}, function(pass, index){
+					    var isPass = false;
+					    
+					    jQuery.ajax({
+							 url: "#getContext()/order/validPassword.do",
+							 type: "post",
+							 data: {"password": pass},
+							 dataType: "json",
+							 async: false,
+							 success: function( result ) {
+								 if (result.code == "1") {
+									 isPass = true;
+								 }
+							 }
+					    });
+						 
+						if ( !isPass ) {
+							layer.msg("密码输入错误");
+							return false;
+						}
+						layer.close(index);
+						ids = ids.substring(1);
+						
+						jQuery.ajax({
+							url: "#getContext()/user/deleteUsers.do",
+							type: "post",
+							data: {"userIds": ids},
+							dataType: "json",
+							async: false,
+							success: function( result ) {
+								layer.confirm(result.msg, {
+								  btn: ["确定"]
+								}, function(){
+								  layer.close(layer.index);
+								  window.location.reload();
+								});
+							},
+							error: function( result ) {
+								layer.confirm(result.msg, {
+								  btn: ["确定"]
+								}, function(){
+								  layer.close(layer.index);
+								  window.location.reload();
+								});
+							}
+						});
+					});
+				}, function() {
+					layer.close(layer.index);
+				});
 			});
 		});
 		

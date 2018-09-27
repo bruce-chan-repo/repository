@@ -149,4 +149,12 @@
   	WHERE
   		order_no = #{orderNo}
   </select>
+  
+  <delete id="batchDeleteByOrderId" parameterType="map">
+  	DELETE
+  		FROM
+  	ytem_order_item_${tableNum}
+  	WHERE
+  		order_no = #{orderId}
+  </delete>
 </mapper>

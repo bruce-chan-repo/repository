@@ -3,6 +3,7 @@ package com.ytem.repository.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.transaction.Transactional;
 
@@ -129,6 +130,29 @@ public class OrderServiceImpl implements OrderService {
 		
 		logger.debug(opreation + ".|完成");
 		return order;
+	}
+
+
+	@Override
+	public int batchDelete(String orderIds) {
+		String opreation = Const.LOGGER_PREFIX_DEBUG + "THREADID = " + Thread.currentThread().getId() + ".|批量删除订单信息.|";
+		logger.debug(opreation + ".|开始");
+		int result = 0;
+		
+		// 删除操作.
+		StringTokenizer token = new StringTokenizer(orderIds, ",");
+		while (token.hasMoreElements()) {
+			Integer orderId = (Integer) token.nextElement();
+			Integer tableNum = orderId % 10;
+			
+			// 删除分表中的数据
+			orderItemMapper.batchDeleteByOrderId(orderId, tableNum);
+			
+			// 删除订单详情
+			result += orderMapper.deleteByPrimaryKey(orderId);
+		}
+		
+		return result;
 	}
 
 }

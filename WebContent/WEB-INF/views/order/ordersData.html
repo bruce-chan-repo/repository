@@ -1,5 +1,6 @@
 #foreach($order in $!{pageInfo.list})
 <tr>
+	<td width="3%"><input type="checkbox" lay-skin="primary" value="$!{order.id}"></td>
 	<td width="5%">$!{order.id}</td>
 	<td width="12%"><a class="seach-detail" href="javascript:;" data-id="$!{order.id}">$!{order.orderNo}</a></td>
 	<td>$!{order.user.realName}</td>
@@ -13,12 +14,12 @@
 #end
 
 <script type="text/javascript">
-	// 保证分页插件只加载一次.
+	// 淇濊瘉鍒嗛〉鎻掍欢鍙姞杞戒竴娆�.
 	if (i == 1) {
 		layui.use('laypage', function(){
 		   var laypage = layui.laypage;
 		  
-		   //完整功能
+		   //瀹屾暣鍔熻兘
 		   laypage.render({
 		     elem: 'pageHelper',
 		     count: '$!{pageInfo.total}',

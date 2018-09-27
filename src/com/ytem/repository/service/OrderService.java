@@ -33,4 +33,11 @@ public interface OrderService {
 	 * @return
 	 */
 	Order getOrderById(Integer id);
+	
+	/**
+	 * 批量删除订单.
+	 * @param orderIds
+	 * @return
+	 */
+	int batchDelete(String orderIds);
 }
