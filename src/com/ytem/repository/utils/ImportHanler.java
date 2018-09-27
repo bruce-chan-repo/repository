@@ -375,7 +375,7 @@ public class ImportHanler {
 		resolverOrder.setCreateTime(date);
 		
 		// 订单标注信息
-		Row lastRow = sheet.getRow(lastRowNum - 1);
+		Row lastRow = sheet.getRow(lastRowNum);
 		String desc = getCellValueByCell(lastRow.getCell(0));
 		String mark = getCellValueByCell(lastRow.getCell(8));
 		

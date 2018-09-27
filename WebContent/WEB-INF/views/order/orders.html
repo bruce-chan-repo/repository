@@ -39,12 +39,12 @@
 		  #end
 				  
 		  <button class="layui-btn seach" data-type="reload">搜索</button>
-		  <button class="layui-btn layui-btn-sm layui-btn-primary order-delete" data-type="isAll">删除</button>
+		  <button class="layui-btn layui-btn-primary order-delete" data-type="isAll">删除</button>
 		</div>
 	</form>
 	<div class="layui-form">
 		<table class="layui-table">
-			<colgroup>
+			<thead>
 				<tr>
 					<th><input type="checkbox" lay-skin="primary" id="checkAll"></th>
 					<th>编号</th>
@@ -144,9 +144,9 @@
 						ids = ids.substring(1);
 						
 						jQuery.ajax({
-							url: "#getContext()/user/deleteUsers.do",
+							url: "#getContext()/order/deleteOrders.do",
 							type: "post",
-							data: {"userIds": ids},
+							data: {"orderIds": ids},
 							dataType: "json",
 							async: false,
 							success: function( result ) {
@@ -170,6 +170,8 @@
 				}, function() {
 					layer.close(layer.index);
 				});
+				
+				return false;
 			});
 		});
 		

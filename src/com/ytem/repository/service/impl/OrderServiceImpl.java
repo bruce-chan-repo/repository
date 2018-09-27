@@ -142,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
 		// 删除操作.
 		StringTokenizer token = new StringTokenizer(orderIds, ",");
 		while (token.hasMoreElements()) {
-			Integer orderId = (Integer) token.nextElement();
+			Integer orderId = Integer.parseInt(token.nextElement().toString());
 			Integer tableNum = orderId % 10;
 			
 			// 删除分表中的数据
